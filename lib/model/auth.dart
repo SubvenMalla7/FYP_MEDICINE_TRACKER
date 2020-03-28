@@ -82,14 +82,15 @@ class Auth with ChangeNotifier {
     if (!pref.containsKey('user')) {
       return false;
     }
-    final userDataExtracted = json.decode(pref.getString('user')) as Map<String,Object>;
+    final userDataExtracted =
+        json.decode(pref.getString('user')) as Map<String, Object>;
     _token = userDataExtracted['token'];
     _userId = userDataExtracted['user_id'];
     notifyListeners();
     return true;
   }
 
-  void logout() async{
+  void logout() async {
     _token = null;
     _userId = null;
     notifyListeners();

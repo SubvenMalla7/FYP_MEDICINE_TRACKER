@@ -16,7 +16,7 @@ class MedicineScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final medicineData = Provider.of<Medicines>(context,listen: false);
+    final medicineData = Provider.of<Medicines>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text('Medicines'),

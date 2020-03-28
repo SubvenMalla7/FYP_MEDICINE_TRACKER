@@ -59,7 +59,8 @@ class MedicineApp extends StatelessWidget {
               backgroundColor: Colors.black12,
               fontFamily: 'Lato',
             ),
-            home: auth.isAuth
+            home: 
+            auth.isAuth
                 ? TabsScreen()
                 : FutureBuilder(
                     future: auth.autoLogin(),

@@ -17,6 +17,7 @@ class Medicines with ChangeNotifier {
   Map<String, String> headers = {
     'Content-type': 'application/json',
     'Accept': 'application/json',
+    
   };
 
   List<Medicine> _items = [];
@@ -38,18 +39,19 @@ class Medicines with ChangeNotifier {
     final extractedData = json.decode(response.body);
 
     final List<Medicine> loadedMedicine = [];
-    var data = extractedData['data'];
+    var data = extractedData;
     print('object');
+    print(id);
     print(extractedData);
 
     // try {
-      print(data.length);
+      //print(data.length);
       data.forEach((medData) {
         var icon = MyIcons.color_pill;
 
         var _color;
-        print(medData);
-        print(medData['amount'].runtimeType);
+        //print(medData);
+        //print(medData['amount'].runtimeType);
         // print('${int.parse(medData['color'])} is fromdata');
         // print(Colors.white.value);
         if (Colors.white70.value == int.parse(medData['color'])) {
@@ -73,7 +75,7 @@ class Medicines with ChangeNotifier {
         if (Colors.black.value == int.parse(medData['color'])) {
           _color = Colors.black;
         }
-        print('lol1');
+        //print('lol1');
         ////////////////////////ICONS///////////////////////////////////
         if (MyIcons.color_pill.codePoint == int.parse(medData['icon'])) {
           icon = MyIcons.color_pill;
@@ -114,7 +116,7 @@ class Medicines with ChangeNotifier {
         if (MyIcons.medicine_bottle.codePoint == int.parse(medData['icon'])) {
           icon = MyIcons.medicine_bottle;
         }
-        print('lol2');
+        //print('lol2');
         loadedMedicine.add(
           Medicine(
             id: medData['id'].toString(),
@@ -130,13 +132,13 @@ class Medicines with ChangeNotifier {
           ),
         );
       });
-      print('lol');
+      //print('lol');
       _items = loadedMedicine;
-      print('loaded is $loadedMedicine');
-      print('lol');
+      //print('loaded is $loadedMedicine');
+      //print('lol');
       notifyListeners();
     } catch (error) {
-      // throw error;
+      throw error;
     }
   }
 
@@ -187,7 +189,7 @@ class Medicines with ChangeNotifier {
     final medIndex = _items.indexWhere((meds) => meds.id == id);
     final url = 'http://10.0.2.2:8000/api/medicine/$id?api_token=$authtoken';
     await http.put(url,
-        headers: headers,
+        // headers: headers,
         body: ({
           "title": newMeds.title,
           "amount": newMeds.amount.toString(),
