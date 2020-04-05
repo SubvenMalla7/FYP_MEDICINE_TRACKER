@@ -11,7 +11,7 @@ class MedicineScedule extends StatelessWidget {
     final medicine = Provider.of<Medicine>(context);
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
-      elevation: 5,
+      elevation: 8,
       child: Container(
         child: Column(
           children: <Widget>[
@@ -39,11 +39,19 @@ class MedicineScedule extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.15),
+                  color: Colors.black.withOpacity(0.005),
                   borderRadius:
                       BorderRadius.vertical(bottom: Radius.circular(20))),
               child: ListTile(
-                leading: medicine.icon,
+                leading: Container(
+                  child: CircleAvatar(
+                    radius: 40,
+                    backgroundColor: medicine.color == Colors.white70.value
+                        ? Colors.black87
+                        : Colors.black12,
+                    child: medicine.icon,
+                  ),
+                ),
                 title: Text(medicine.title),
                 subtitle: Text('Take ${medicine.amount.toString()}'),
                 trailing: Icon(

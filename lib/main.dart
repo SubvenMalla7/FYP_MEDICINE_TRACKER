@@ -11,6 +11,8 @@ import './screens/add_screen.dart';
 import './screens/auth_screen.dart';
 import './screens/dashboard_screen.dart';
 import './screens/splash_screen.dart';
+import './screens/medcineScreen.dart';
+import './screens/user_profile.dart';
 
 void main() {
   runApp(MyApp());
@@ -39,6 +41,12 @@ class MedicineApp extends StatelessWidget {
               authData.userId,
             ),
           ),
+          ChangeNotifierProvider.value(
+            value: Medicines(
+              authData.token,
+              authData.userId,
+            ),
+          ),
           // ChangeNotifierProxyProvider<Auth, Medicines>(
           //      create: (context) => Medicines('','', []),
           //   //   var auth = Provider.of<Auth>(context);
@@ -56,11 +64,10 @@ class MedicineApp extends StatelessWidget {
               //primaryColor: Color.fromRGBO(232, 177, 0, 1),//yellow
               primaryColor: Color.fromRGBO(227, 152, 23, 1),
               accentColor: Color.fromRGBO(192, 19, 56, 1), //red
-              backgroundColor: Colors.black12,
+              backgroundColor: Colors.white,
               fontFamily: 'Lato',
             ),
-            home: 
-            auth.isAuth
+            home: auth.isAuth
                 ? TabsScreen()
                 : FutureBuilder(
                     future: auth.autoLogin(),
@@ -78,6 +85,8 @@ class MedicineApp extends StatelessWidget {
               MedicineScreen.routeName: (ctx) => MedicineScreen(),
               TabsScreen.routeName: (ctx) => TabsScreen(),
               AddScreen.routeName: (ctx) => AddScreen(),
+              SingleMedicine.routeName: (ctx) => SingleMedicine(),
+              UserProfile.routeName: (ctx) => UserProfile(),
             },
           ),
         ));

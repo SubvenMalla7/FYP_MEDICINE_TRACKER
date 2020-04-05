@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:intl/intl.dart';
+
+import 'package:test_dasd/screens/tab_screen.dart';
 import '../my_icons_icons.dart';
 import 'package:provider/provider.dart';
-
 import '../model/Medicine.dart';
 import '../model/medicine_prrovider.dart';
 
@@ -16,7 +17,9 @@ class AddScreen extends StatefulWidget {
 class _AddScreenState extends State<AddScreen> {
   //variables
   final _form = GlobalKey<FormState>();
-  int _groupValue = 1;
+  int _groupValue = 4;
+  static DateTime dateTime = DateTime.now();
+  String date = DateFormat("yyyy-MM-dd").format(dateTime);
   var _editedMedicine = Medicine(
     id: null,
     title: '',
@@ -26,13 +29,17 @@ class _AddScreenState extends State<AddScreen> {
       _icon,
     ),
     color: 0,
-    // iconColor: Colors.white
+    date: DateTime.now().toString(),
+    instruction: '',
+    note: '',
+    type: '',
   );
-  String _currentItemSelected = 'Once a day';
+  String _freqencyItemSelected = 'Once a day';
   String _currentUnitSelected = 'tablet(s)';
+  String _instruction = "Doesn't matter";
   TimeOfDay _time = TimeOfDay.now();
-  double dose = 0.25;
-  DateTime dateTime = DateTime.now();
+  double dose = 0;
+  String selectedUnit = 'tablet(s)';
   int days;
   String daysTitle = 'Number of days';
   static List<IconData> icons = [
@@ -133,13 +140,16 @@ class _AddScreenState extends State<AddScreen> {
           time = _time.format(context);
 
           _editedMedicine = Medicine(
-            id: _editedMedicine.id,
-            title: _editedMedicine.title,
-            amount: _editedMedicine.amount,
-            time: time.toString(),
-            icon: _editedMedicine.icon,
-            color: _editedMedicine.color,
-          );
+              id: _editedMedicine.id,
+              title: _editedMedicine.title,
+              amount: _editedMedicine.amount,
+              time: time.toString(),
+              icon: _editedMedicine.icon,
+              color: _editedMedicine.color,
+              date: _editedMedicine.date,
+              instruction: _editedMedicine.instruction,
+              note: _editedMedicine.note,
+              type: _editedMedicine.type);
         },
       );
     }
@@ -154,13 +164,17 @@ class _AddScreenState extends State<AddScreen> {
     _editedMedicine = Medicine(
       id: _editedMedicine.id,
       title: _editedMedicine.title,
-      amount: dose,
+      amount: _editedMedicine.id != null ? _editedMedicine.amount : dose,
       time: _time.format(context),
       icon: Icon(
         _icon,
         color: _iconColor,
       ),
       color: _iconColor.value,
+      instruction: _editedMedicine.instruction,
+      date: date,
+      note: _editedMedicine.note,
+      type: selectedUnit,
     );
 
     // print(_editedMedicine.color);
@@ -173,9 +187,6 @@ class _AddScreenState extends State<AddScreen> {
     if (_editedMedicine.id != null) {
       await Provider.of<Medicines>(context, listen: false)
           .updateMedicine(_editedMedicine.id, _editedMedicine);
-      // print(_editedMedicine.icon);
-      print(_editedMedicine.color);
-      print(Colors.grey.value);
     } else {
       try {
         await Provider.of<Medicines>(context, listen: false)
@@ -210,9 +221,8 @@ class _AddScreenState extends State<AddScreen> {
     setState(() {
       _isLoading = false;
     });
-    Navigator.of(context).pop();
 
-    // print(_editedMedicine.time);
+    Navigator.of(context).pushNamed(TabsScreen.routeName);
   }
 
   Future<Null> _selectDose(BuildContext context) async {
@@ -272,6 +282,21 @@ class _AddScreenState extends State<AddScreen> {
       setState(
         () {
           dateTime = picked;
+          _editedMedicine = Medicine(
+            id: _editedMedicine.id,
+            title: _editedMedicine.title,
+            amount: _editedMedicine.id != null ? _editedMedicine.amount : dose,
+            time: _time.format(context),
+            icon: Icon(
+              _icon,
+              color: _iconColor,
+            ),
+            color: _iconColor.value,
+            instruction: _editedMedicine.instruction,
+            date: DateFormat("yyyy-MM-dd").format(dateTime),
+            note: _editedMedicine.note,
+            type: selectedUnit,
+          );
         },
       );
     }
@@ -365,7 +390,7 @@ class _AddScreenState extends State<AddScreen> {
   @override
   Widget build(BuildContext context) {
     Color color = Theme.of(context).primaryColor;
-    String date = DateFormat("yyyy-MM-dd").format(dateTime);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Add Your Meds',
@@ -412,7 +437,11 @@ class _AddScreenState extends State<AddScreen> {
                                     amount: _editedMedicine.amount,
                                     time: _editedMedicine.time,
                                     icon: _editedMedicine.icon,
-                                    color: _editedMedicine.color);
+                                    color: _editedMedicine.color,
+                                    date: _editedMedicine.date,
+                                    instruction: _editedMedicine.instruction,
+                                    note: _editedMedicine.note,
+                                    type: _editedMedicine.type);
                               },
                             ),
                           ),
@@ -445,26 +474,130 @@ class _AddScreenState extends State<AddScreen> {
                                           _myRadioButton(
                                             title: "Before eating",
                                             value: 1,
-                                            onChanged: (newValue) => setState(
-                                                () => _groupValue = newValue),
+                                            onChanged: (newValue) =>
+                                                setState(() => {
+                                                      _groupValue = newValue,
+                                                      _instruction =
+                                                          "Before eating",
+                                                      _editedMedicine = Medicine(
+                                                          id: _editedMedicine
+                                                              .id,
+                                                          title: _editedMedicine
+                                                              .title,
+                                                          amount:
+                                                              _editedMedicine
+                                                                  .amount,
+                                                          time: _editedMedicine
+                                                              .time,
+                                                          icon: _editedMedicine
+                                                              .icon,
+                                                          color: _editedMedicine
+                                                              .color,
+                                                          date: _editedMedicine
+                                                              .date,
+                                                          instruction:
+                                                              _instruction,
+                                                          note: _editedMedicine
+                                                              .note,
+                                                          type: _editedMedicine
+                                                              .type),
+                                                    }),
                                           ),
                                           _myRadioButton(
                                             title: "While eating",
                                             value: 2,
-                                            onChanged: (newValue) => setState(
-                                                () => _groupValue = newValue),
+                                            onChanged: (newValue) =>
+                                                setState(() => {
+                                                      _groupValue = newValue,
+                                                      _instruction =
+                                                          "While eating",
+                                                      _editedMedicine = Medicine(
+                                                          id: _editedMedicine
+                                                              .id,
+                                                          title: _editedMedicine
+                                                              .title,
+                                                          amount:
+                                                              _editedMedicine
+                                                                  .amount,
+                                                          time: _editedMedicine
+                                                              .time,
+                                                          icon: _editedMedicine
+                                                              .icon,
+                                                          color: _editedMedicine
+                                                              .color,
+                                                          date: _editedMedicine
+                                                              .date,
+                                                          instruction:
+                                                              _instruction,
+                                                          note: _editedMedicine
+                                                              .note,
+                                                          type: _editedMedicine
+                                                              .type),
+                                                    }),
                                           ),
                                           _myRadioButton(
                                             title: "After eating",
                                             value: 3,
-                                            onChanged: (newValue) => setState(
-                                                () => _groupValue = newValue),
+                                            onChanged: (newValue) =>
+                                                setState(() => {
+                                                      _groupValue = newValue,
+                                                      _instruction =
+                                                          "After eating",
+                                                      _editedMedicine = Medicine(
+                                                          id: _editedMedicine
+                                                              .id,
+                                                          title: _editedMedicine
+                                                              .title,
+                                                          amount:
+                                                              _editedMedicine
+                                                                  .amount,
+                                                          time: _editedMedicine
+                                                              .time,
+                                                          icon: _editedMedicine
+                                                              .icon,
+                                                          color: _editedMedicine
+                                                              .color,
+                                                          date: _editedMedicine
+                                                              .date,
+                                                          instruction:
+                                                              _instruction,
+                                                          note: _editedMedicine
+                                                              .note,
+                                                          type: _editedMedicine
+                                                              .type),
+                                                    }),
                                           ),
                                           _myRadioButton(
                                             title: "Doesn't matter",
                                             value: 4,
-                                            onChanged: (newValue) => setState(
-                                                () => _groupValue = newValue),
+                                            onChanged: (newValue) =>
+                                                setState(() => {
+                                                      _groupValue = newValue,
+                                                      _instruction =
+                                                          "Doesn't matter",
+                                                      _editedMedicine = Medicine(
+                                                          id: _editedMedicine
+                                                              .id,
+                                                          title: _editedMedicine
+                                                              .title,
+                                                          amount:
+                                                              _editedMedicine
+                                                                  .amount,
+                                                          time: _editedMedicine
+                                                              .time,
+                                                          icon: _editedMedicine
+                                                              .icon,
+                                                          color: _editedMedicine
+                                                              .color,
+                                                          date: _editedMedicine
+                                                              .date,
+                                                          instruction:
+                                                              _instruction,
+                                                          note: _editedMedicine
+                                                              .note,
+                                                          type: _editedMedicine
+                                                              .type),
+                                                    }),
                                           ),
                                         ],
                                       ),
@@ -475,7 +608,20 @@ class _AddScreenState extends State<AddScreen> {
                                                 'Any other instructions?'),
                                         keyboardType: TextInputType.multiline,
                                         maxLines: 3,
-                                        onSaved: (value) {},
+                                        onSaved: (value) {
+                                          _editedMedicine = Medicine(
+                                              id: _editedMedicine.id,
+                                              title: _editedMedicine.title,
+                                              amount: _editedMedicine.amount,
+                                              time: _editedMedicine.time,
+                                              icon: _editedMedicine.icon,
+                                              color: _editedMedicine.color,
+                                              date: _editedMedicine.date,
+                                              instruction:
+                                                  _editedMedicine.instruction,
+                                              note: value,
+                                              type: _editedMedicine.type);
+                                        },
                                       ),
                                     ],
                                   ),
@@ -526,11 +672,11 @@ class _AddScreenState extends State<AddScreen> {
                                               }).toList(),
                                               onChanged: (String newValue) {
                                                 setState(() {
-                                                  this._currentItemSelected =
+                                                  this._freqencyItemSelected =
                                                       newValue;
                                                 });
                                               },
-                                              value: _currentItemSelected,
+                                              value: _freqencyItemSelected,
                                             ),
                                           ),
                                         ],
@@ -553,7 +699,9 @@ class _AddScreenState extends State<AddScreen> {
                                           style: textStyle(),
                                         ),
                                         Text(
-                                          '${_time.format(context)}',
+                                          _editedMedicine.id != null
+                                              ? _editedMedicine.time
+                                              : '${_time.format(context)}',
                                           style: TextStyle(
                                             fontSize: 18,
                                             color: color,
@@ -584,9 +732,14 @@ class _AddScreenState extends State<AddScreen> {
                                                   MdiIcons.minus,
                                                 ),
                                                 onPressed: () {
-                                                  if (dose > 0.25) {
+                                                  if (dose > 0 ||
+                                                      _editedMedicine.amount >
+                                                          0) {
                                                     setState(() {
-                                                      dose -= 0.25;
+                                                      _editedMedicine.id != null
+                                                          ? _editedMedicine
+                                                              .amount -= 0.25
+                                                          : dose -= 0.25;
                                                     });
                                                   }
                                                 },
@@ -606,7 +759,10 @@ class _AddScreenState extends State<AddScreen> {
                                                             width: 3)),
                                                   ),
                                                   child: Text(
-                                                    dose.toString(),
+                                                    _editedMedicine.id != null
+                                                        ? _editedMedicine.amount
+                                                            .toString()
+                                                        : dose.toString(),
                                                     style: TextStyle(
                                                         color: color,
                                                         fontWeight:
@@ -622,14 +778,17 @@ class _AddScreenState extends State<AddScreen> {
                                                 ),
                                                 onPressed: () {
                                                   setState(() {
-                                                    dose += 0.25;
+                                                    _editedMedicine.id != null
+                                                        ? _editedMedicine
+                                                            .amount += 0.25
+                                                        : dose += 0.25;
                                                   });
                                                 },
                                               ),
                                               Container(
                                                 child: DropdownButton<String>(
-                                                  items: _unit.map(
-                                                      (String selectedUnit) {
+                                                  items:
+                                                      _unit.map((selectedUnit) {
                                                     return DropdownMenuItem<
                                                         String>(
                                                       value: selectedUnit,
@@ -867,8 +1026,6 @@ class _AddScreenState extends State<AddScreen> {
                                                 child: GestureDetector(
                                                   onTap: () => {
                                                     _changeIconColor(color),
-                                                    // print(color.value),
-                                                    print(Colors.white.value)
                                                   },
                                                   child: CircleAvatar(
                                                     backgroundColor: color,

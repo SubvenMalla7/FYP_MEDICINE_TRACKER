@@ -18,8 +18,7 @@ class DashBoardScreen extends StatefulWidget {
   _DashBoardScreenState createState() => _DashBoardScreenState();
 }
 
-class _DashBoardScreenState extends State<DashBoardScreen>
-    with AutomaticKeepAliveClientMixin {
+class _DashBoardScreenState extends State<DashBoardScreen> {
   var _isInt = true;
   var isLoading = true;
 
@@ -37,7 +36,7 @@ class _DashBoardScreenState extends State<DashBoardScreen>
   @override
   Widget build(BuildContext context) {
     final medicine = Provider.of<Medicines>(context);
-    super.build(context);
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -105,8 +104,6 @@ class _DashBoardScreenState extends State<DashBoardScreen>
             label: 'Add Mesurements',
             labelStyle: TextStyle(color: Theme.of(context).accentColor),
             onTap: () {
-              Navigator.of(context).pushReplacementNamed('/');
-              Provider.of<Auth>(context, listen: false).logout();
               print("Add dose");
             },
           ),
@@ -120,7 +117,4 @@ class _DashBoardScreenState extends State<DashBoardScreen>
       ),
     );
   }
-
-  @override
-  bool get wantKeepAlive => true;
 }

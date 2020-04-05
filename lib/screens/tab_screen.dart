@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import './medicines_screen.dart';
 
+import './medicines_screen.dart';
 import './dashboard_screen.dart';
+import './user_profile.dart';
 import '../widgets/app_drawer.dart';
 
 class TabsScreen extends StatefulWidget {
@@ -25,6 +26,10 @@ class _TabsScreenState extends State<TabsScreen> {
         'page': MedicineScreen(),
         'title': 'Add Medicines',
       },
+      {
+        'page': UserProfile(),
+        'title': 'Add Medicines',
+      },
      
     ];
     super.initState();
@@ -44,9 +49,9 @@ class _TabsScreenState extends State<TabsScreen> {
       bottomNavigationBar: BottomNavigationBar(
         elevation: 10,
         onTap: _selectPage,
-        backgroundColor: Colors.white60,
-        unselectedItemColor: Colors.black54,
-        selectedItemColor: Theme.of(context).primaryColor,
+        backgroundColor: Theme.of(context).primaryColor.withOpacity(0.8),
+        unselectedItemColor: Colors.black,
+        selectedItemColor: Theme.of(context).accentColor,
         currentIndex: _selectedPageIndex,
         // type: BottomNavigationBarType.fixed,
         items: [
@@ -66,11 +71,12 @@ class _TabsScreenState extends State<TabsScreen> {
               style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
             ),
           ),
-          // BottomNavigationBarItem(
-          //   backgroundColor: Theme.of(context).primaryColor,
-          //   icon: Icon(Icons.more_horiz),
-          //   title: Text('More'),
-          // ),
+          BottomNavigationBarItem(
+            backgroundColor: Theme.of(context).primaryColor,
+            icon: Icon(Icons.person_outline),
+            title: Text('Profile',
+             style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),),
+          ),
         ],
       ),
     );

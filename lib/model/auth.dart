@@ -5,9 +5,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import './http_exception.dart';
 
+import './User.dart';
+
 class Auth with ChangeNotifier {
-  String _token;
-  String _userId;
+  String token;
+  String userId;
 
   Map<String, String> headers = {
     'Content-type': 'application/json',
@@ -18,15 +20,21 @@ class Auth with ChangeNotifier {
     return token != null;
   }
 
-  String get token {
-    if (_token != null) {
-      return _token;
+  String get token_1 {
+    if (token != null) {
+      return token;
     }
     return null;
   }
 
-  String get userId {
-    return _userId;
+  List<User> _items = [];
+
+  List<User> get items {
+    return [..._items];
+  }
+
+  String get userid {
+    return userId;
   }
 
   Future<void> _authenticate(
@@ -53,17 +61,17 @@ class Auth with ChangeNotifier {
         print('hello');
         throw HttpException(responseData['errors']);
       }
-      _token = responseData['token'];
-      _userId = responseData['localId'].toString();
-      print(_userId);
+      token = responseData['token'];
+      userId = responseData['localId'].toString();
+
       notifyListeners();
       final pref = await SharedPreferences.getInstance();
-      final userData = json.encode({'token': _token, 'user_id': _userId});
+      final userData = json.encode({'token': token, 'user_id': userId});
       pref.setString('user', userData);
       print('subven');
       print(pref.getString('user'));
     } catch (error) {
-      print(_userId);
+      print(userId);
       print(error);
       throw error;
     }
@@ -84,17 +92,33 @@ class Auth with ChangeNotifier {
     }
     final userDataExtracted =
         json.decode(pref.getString('user')) as Map<String, Object>;
-    _token = userDataExtracted['token'];
-    _userId = userDataExtracted['user_id'];
+    token = userDataExtracted['token'];
+    userId = userDataExtracted['user_id'];
     notifyListeners();
     return true;
   }
 
   void logout() async {
-    _token = null;
-    _userId = null;
+    token = null;
+    userId = null;
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     prefs.remove('user');
+  }
+
+  Future<void> fetchUserData() async {
+    final url = 'http://10.0.2.2:8000/api/userData?api_token=$token';
+    // const url='http://192.168.0.103:8000/api/medicine';
+    try {
+      final response = await http.get(url, headers: headers);
+      final extractedData = json.decode(response.body);
+      _items.add(User(
+        id: extractedData['id'],
+        name: extractedData['name'],
+        email: extractedData['email'],
+      ));
+    } catch (error) {
+      throw error;
+    }
   }
 }

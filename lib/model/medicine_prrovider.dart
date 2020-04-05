@@ -8,7 +8,6 @@ import 'package:http/http.dart' as http;
 import './Medicine.dart';
 import './http_exception.dart';
 
-
 class Medicines with ChangeNotifier {
   final String authtoken;
   final String id;
@@ -17,7 +16,6 @@ class Medicines with ChangeNotifier {
   Map<String, String> headers = {
     'Content-type': 'application/json',
     'Accept': 'application/json',
-    
   };
 
   List<Medicine> _items = [];
@@ -31,20 +29,19 @@ class Medicines with ChangeNotifier {
   }
 
   Future<void> fetchAndSetMeds() async {
-
     final url = 'http://10.0.2.2:8000/api/medicine?api_token=$authtoken';
     // const url='http://192.168.0.103:8000/api/medicine';
     try {
-    final response = await http.get(url, headers: headers);
-    final extractedData = json.decode(response.body);
+      final response = await http.get(url, headers: headers);
+      final extractedData = json.decode(response.body);
 
-    final List<Medicine> loadedMedicine = [];
-    var data = extractedData;
-    print('object');
-    print(id);
-    print(extractedData);
+      final List<Medicine> loadedMedicine = [];
+      var data = extractedData;
+      print('object');
+      print(id);
+      print(extractedData);
 
-    // try {
+      // try {
       //print(data.length);
       data.forEach((medData) {
         var icon = MyIcons.color_pill;
@@ -55,13 +52,13 @@ class Medicines with ChangeNotifier {
         // print('${int.parse(medData['color'])} is fromdata');
         // print(Colors.white.value);
         if (Colors.white70.value == int.parse(medData['color'])) {
-          _color = Colors.white70;
+          _color = Colors.white;
         }
         if (Colors.red.value == int.parse(medData['color'])) {
           _color = Colors.red;
         }
-        if (Colors.yellow.value == int.parse(medData['color'])) {
-          _color = Colors.yellow;
+        if (Colors.orange.value == int.parse(medData['color'])) {
+          _color = Colors.orange;
         }
         if (Colors.blue.value == int.parse(medData['color'])) {
           _color = Colors.blue;
@@ -116,20 +113,24 @@ class Medicines with ChangeNotifier {
         if (MyIcons.medicine_bottle.codePoint == int.parse(medData['icon'])) {
           icon = MyIcons.medicine_bottle;
         }
-        //print('lol2');
+        print('asdasdas');
+        print(medData['start_date'].toString());
         loadedMedicine.add(
           Medicine(
-            id: medData['id'].toString(),
-            title: medData['title'],
-            amount:0,
-            time: medData['time'],
-            icon: Icon(
-              icon,
-              color: _color,
-            ),
-            color: int.parse(medData['color']),
-            // icon: medData['icon'],
-          ),
+              id: medData['id'].toString(),
+              title: medData['title'],
+              amount: double.parse(medData['amount']),
+              time: medData['time'],
+              icon: Icon(
+                icon,
+                size: 30,
+                color: _color,
+              ),
+              color: int.parse(medData['color']),
+              date: medData['start_date'],
+              instruction: medData['instruction'],
+              note: medData['note'],
+              type: medData['type']),
         );
       });
       //print('lol');
@@ -159,9 +160,13 @@ class Medicines with ChangeNotifier {
         'title': medicine.title,
         'amount': medicine.amount,
         'time': medicine.time,
+        'start_date': medicine.date,
         'icon': medicine.icon.icon.codePoint.toString(),
         'color': medicine.color.toString(),
         'user_id': int.parse(id),
+        'type': medicine.type,
+        'instruction': medicine.instruction,
+        'note': medicine.note,
       }),
     );
     // icon=medicine.icon;
@@ -174,9 +179,12 @@ class Medicines with ChangeNotifier {
       time: medicine.time,
       icon: medicine.icon,
       color: medicine.color,
+      date: medicine.date,
+      instruction: medicine.instruction,
+      note: medicine.note,
+      type: medicine.type,
     );
-    // print(medicine.icon);
-    print(json.decode(response.body)['data']['id']);
+    //    print(json.decode(response.body)['data']['id']);
     _items.add(newMedicine);
     notifyListeners();
     // } catch (error) {
@@ -186,17 +194,24 @@ class Medicines with ChangeNotifier {
   }
 
   Future<void> updateMedicine(String id, Medicine newMeds) async {
+    print(newMeds.instruction);
     final medIndex = _items.indexWhere((meds) => meds.id == id);
     final url = 'http://10.0.2.2:8000/api/medicine/$id?api_token=$authtoken';
-    await http.put(url,
-        // headers: headers,
-        body: ({
-          "title": newMeds.title,
-          "amount": newMeds.amount.toString(),
-          "time": newMeds.time,
-          "icon": newMeds.icon.icon.codePoint.toString(),
-          "color": newMeds.color.toString(),
-        }));
+    await http.put(
+      url,
+      body: ({
+        "title": newMeds.title,
+        "amount": newMeds.amount.toString(),
+        "time": newMeds.time,
+        "icon": newMeds.icon.icon.codePoint.toString(),
+        "color": newMeds.color.toString(),
+        "type": newMeds.type,
+        "instruction": newMeds.instruction,
+        "start_date": newMeds.date,
+        "note": newMeds.date
+      }),
+    );
+    print(newMeds.instruction);
     if (medIndex >= 0) {
       _items[medIndex] = newMeds;
       notifyListeners();
@@ -221,3 +236,5 @@ class Medicines with ChangeNotifier {
     existingMedicine = null;
   }
 }
+
+
