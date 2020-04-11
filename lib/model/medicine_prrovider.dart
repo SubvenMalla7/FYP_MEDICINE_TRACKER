@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 
 import './Medicine.dart';
 import './http_exception.dart';
+import 'MedicineLog.dart';
 
 class Medicines with ChangeNotifier {
   final String authtoken;
@@ -22,6 +23,12 @@ class Medicines with ChangeNotifier {
 
   List<Medicine> get items {
     return [..._items];
+  }
+
+  List<MedicineLog> _logitems = [];
+
+  List<MedicineLog> get logitems {
+    return [..._logitems];
   }
 
   Medicine findById(String id) {
@@ -113,8 +120,7 @@ class Medicines with ChangeNotifier {
         if (MyIcons.medicine_bottle.codePoint == int.parse(medData['icon'])) {
           icon = MyIcons.medicine_bottle;
         }
-        print('asdasdas');
-        print(medData['start_date'].toString());
+
         loadedMedicine.add(
           Medicine(
               id: medData['id'].toString(),
@@ -171,7 +177,12 @@ class Medicines with ChangeNotifier {
     );
     // icon=medicine.icon;
     // color=medicine.color;
-    // print(medicine.icon);
+    print(medicine.icon);
+    print('object');
+    print(medicine.type);
+    print(medicine.instruction);
+    print(medicine.note);
+
     final newMedicine = Medicine(
       id: json.decode(response.body)['data']['id'].toString(),
       title: medicine.title,
@@ -235,6 +246,42 @@ class Medicines with ChangeNotifier {
     }
     existingMedicine = null;
   }
+
+////////////////////////////////////////MEDICIENE LOG//////////////////////////////////////////////////
+
+  Future<void> addMedicinesLog(MedicineLog medicineLog) async {
+    final url = 'http://10.0.2.2:8000/api/medicineLog?api_token=$authtoken';
+    // const url='http://192.168.0.103:8000/api/medicine';
+
+    // try {
+    await http.post(
+      url,
+      headers: headers,
+      body: json.encode({
+        'title': medicineLog.title,
+        'amount': medicineLog.amount,
+        'time': medicineLog.time,
+        'start_date': medicineLog.date,
+        'user_id': int.parse(id),
+        'status': medicineLog.status,
+        'reasons': medicineLog.reasons,
+      }),
+    );
+
+    final newMedicineLog = MedicineLog(
+      title: medicineLog.title,
+      amount: medicineLog.amount,
+      time: medicineLog.time,
+      date: medicineLog.date,
+      status: medicineLog.status,
+      reasons: medicineLog.reasons,
+    );
+    //    print(json.decode(response.body)['data']['id']);
+    _logitems.add(newMedicineLog);
+    notifyListeners();
+    // } catch (error) {
+    //   print(error);
+    //   throw error;
+    // }
+  }
 }
-
-

@@ -45,13 +45,33 @@ class MedicineScreen extends StatelessWidget {
               itemCount: medicineData.items.length,
               itemBuilder: (_, i) => Column(
                 children: <Widget>[
-                  InkWell(
-                    onTap: () => {
-                      Navigator.of(context).pushNamed(SingleMedicine.routeName,
-                          arguments: medicineData.items[i])
+                  Dismissible(
+                    key: Key(medicineData.items[i].id),
+                    direction: DismissDirection.endToStart,
+                    background: Container(
+                      color: Theme.of(context).errorColor,
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Icon(
+                            Icons.delete,
+                            size: 30,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                    onDismissed: (direction) async {
+                      await Provider.of<Medicines>(context, listen: false)
+                          .deleteMeds(medicineData.items[i].id);
                     },
-                    child: Hero(
-                      tag: medicineData.items[i].title,
+                    child: InkWell(
+                      onTap: () => {
+                        Navigator.of(context).pushNamed(
+                            SingleMedicine.routeName,
+                            arguments: medicineData.items[i])
+                      },
                       child: Column(
                         children: <Widget>[
                           UserMedicines(

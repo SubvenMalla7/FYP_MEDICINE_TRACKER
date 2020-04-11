@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:intl/intl.dart';
 
@@ -10,12 +11,14 @@ import '../model/medicine_prrovider.dart';
 
 class AddScreen extends StatefulWidget {
   static const routeName = '/add';
+
   @override
   _AddScreenState createState() => _AddScreenState();
 }
 
 class _AddScreenState extends State<AddScreen> {
   //variables
+
   final _form = GlobalKey<FormState>();
   int _groupValue = 4;
   static DateTime dateTime = DateTime.now();
@@ -76,7 +79,8 @@ class _AddScreenState extends State<AddScreen> {
   var inIt = true;
   List<bool> isSelected;
   var _isLoading = false;
-
+  FlutterLocalNotificationsPlugin localNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
   Widget buildCard({child}) {
     return Card(
       margin: const EdgeInsets.all(10),
@@ -372,6 +376,7 @@ class _AddScreenState extends State<AddScreen> {
       false,
       false,
     ];
+    initializeNotification();
   }
 
   @override
@@ -387,6 +392,14 @@ class _AddScreenState extends State<AddScreen> {
     super.didChangeDependencies();
   }
 
+  initializeNotification() async {
+    var initiallizeAndroid = AndroidInitializationSettings('ic_launcher');
+    var initiallizeIOS = IOSInitializationSettings();
+    var initSettings =
+        InitializationSettings(initiallizeAndroid, initiallizeIOS);
+    await localNotificationsPlugin.initialize(initSettings);
+  }
+
   @override
   Widget build(BuildContext context) {
     Color color = Theme.of(context).primaryColor;
@@ -400,7 +413,11 @@ class _AddScreenState extends State<AddScreen> {
           Padding(
             padding: const EdgeInsets.only(right: 15.0),
             child: IconButton(
-                icon: Icon(Icons.check), onPressed: () => _save(context)),
+                icon: Icon(Icons.check),
+                onPressed: () async {
+                  _save(context);
+                  notification();
+                }),
           )
         ],
       ),
@@ -1046,7 +1063,10 @@ class _AddScreenState extends State<AddScreen> {
                             child: RaisedButton(
                               elevation: 5,
                               color: Theme.of(context).accentColor,
-                              onPressed: () => _save(context),
+                              onPressed: () {
+                                _save(context);
+                                notification();
+                              },
                               child: Text(
                                 'Done',
                                 style: TextStyle(color: Colors.white),
@@ -1060,6 +1080,57 @@ class _AddScreenState extends State<AddScreen> {
                 ),
               ),
             ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => notification(),
+        child: Icon(Icons.notifications),
+      ),
     );
+  }
+
+/////////////////////////////////// NOTIFICATION////////////////////////////////////////////////////////
+  Future<void> notification() async {
+    String hour = _time.hour.toString();
+    String min = _time.minute.toString().length == 2
+        ? _time.minute.toString()
+        : '0${_time.minute.toString()}';
+    print(date);
+    print(_time.format(context));
+    DateTime now = DateTime.parse("$date $hour:$min:00");
+    //DateTime.now().toUtc().add(Duration(seconds: 5));
+    await singleNotification(
+      localNotificationsPlugin,
+      now,
+      " It's time to take your medicine",
+      'Please Take ${_editedMedicine.amount} ${_editedMedicine.type} of ${_editedMedicine.title}',
+      int.parse((_time.hour.toString() + _time.minute.toString())),
+      _time.format(context),
+      RepeatInterval.Daily,
+    );
+  }
+
+  Future singleNotification(
+    FlutterLocalNotificationsPlugin plugin,
+    DateTime date,
+    String message,
+    String subText,
+    int hashcode,
+    String channelId,
+    RepeatInterval interval,
+  ) {
+    var androidChannel = AndroidNotificationDetails(
+      channelId,
+      'chanel-name',
+      'chanel-description',
+      importance: Importance.Max,
+      priority: Priority.Max,
+    );
+    print('Channel-Id $hashcode');
+    var iosChannel = IOSNotificationDetails();
+    var platformChannel = NotificationDetails(androidChannel, iosChannel);
+    plugin.
+    // periodicallyShow(
+    //     hashcode, message, subText, interval, platformChannel);
+    schedule(hashcode, message, subText, date, platformChannel,
+        payload: hashCode.toString());
   }
 }

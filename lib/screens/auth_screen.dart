@@ -1,9 +1,6 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../screens/tab_screen.dart';
 import '../model/auth.dart';
 import '../model/http_exception.dart';
 
@@ -14,9 +11,6 @@ class AuthScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final deviceSize = MediaQuery.of(context).size;
-    // final transformConfig = Matrix4.rotationZ(-8 * pi / 180);
-    // transformConfig.translate(-10.0);
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Container(

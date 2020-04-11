@@ -27,11 +27,11 @@ class Auth with ChangeNotifier {
     return null;
   }
 
-  List<User> _items = [];
+  List<User> items = [];
 
-  List<User> get items {
-    return [..._items];
-  }
+  // List<User> get items {
+  //   return [..._items];
+  // }
 
   String get userid {
     return userId;
@@ -112,8 +112,8 @@ class Auth with ChangeNotifier {
     try {
       final response = await http.get(url, headers: headers);
       final extractedData = json.decode(response.body);
-      _items.add(User(
-        id: extractedData['id'],
+      items.add(User(
+        id: extractedData['id'].toString(),
         name: extractedData['name'],
         email: extractedData['email'],
       ));

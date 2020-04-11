@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+
 import 'package:test_dasd/widgets/app_drawer.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../widgets/medicine_scedule.dart';
 import '../widgets/calender_widget.dart';
 import '../model/medicine_prrovider.dart';
-//import '../screens/add_medicines.dart';
+import '../screens/maps&phones.dart';
 import '../screens/add_screen.dart';
 import '../my_icons_icons.dart';
-import '../model/auth.dart';
 
 class DashBoardScreen extends StatefulWidget {
   static const routeName = '/dashboard';
@@ -20,16 +21,14 @@ class DashBoardScreen extends StatefulWidget {
 
 class _DashBoardScreenState extends State<DashBoardScreen> {
   var _isInt = true;
-  var isLoading = true;
 
   @override
   void didChangeDependencies() {
-    print(_isInt);
     if (_isInt) {
       Provider.of<Medicines>(context).fetchAndSetMeds();
     }
     _isInt = false;
-    isLoading = false;
+
     super.didChangeDependencies();
   }
 
@@ -48,43 +47,39 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: IconButton(
-              onPressed: () {},
-              icon: Icon(MyIcons.emergency,
+              onPressed: () => Navigator.of(context).pushNamed(Map.routeName),
+              icon: Icon(FontAwesomeIcons.mapMarkedAlt,
                   color: Theme.of(context).accentColor, size: 25),
             ),
           )
         ],
       ),
       drawer: AppDrawer(),
-      body: isLoading
-          ? Center(
-              child: CircularProgressIndicator(),
-            )
-          : SingleChildScrollView(
-              child: Container(
-                color: Theme.of(context).backgroundColor,
-                child: Column(
-                  children: <Widget>[
-                    Container(
-                      margin: const EdgeInsets.only(top: 10, left: 5, right: 5),
-                      child: Calender(),
-                    ),
-                    Container(
-                      height: 520,
-                      //height: 460,
-                      padding: const EdgeInsets.all(10),
-                      child: ListView.builder(
-                        itemBuilder: (ctx, i) => ChangeNotifierProvider.value(
-                          value: medicine.items[i],
-                          child: MedicineScedule(),
-                        ),
-                        itemCount: medicine.items.length,
-                      ),
-                    )
-                  ],
-                ),
+      body: SingleChildScrollView(
+        child: Container(
+          color: Theme.of(context).backgroundColor,
+          child: Column(
+            children: <Widget>[
+              Container(
+                margin: const EdgeInsets.only(top: 10, left: 5, right: 5),
+                child: Calender(),
               ),
-            ),
+              Container(
+                height: 520,
+                //height: 460,
+                padding: const EdgeInsets.all(10),
+                child: ListView.builder(
+                  itemBuilder: (ctx, i) => ChangeNotifierProvider.value(
+                    value: medicine.items[i],
+                    child: MedicineScedule(),
+                  ),
+                  itemCount: medicine.items.length,
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
       floatingActionButton: SpeedDial(
         animatedIcon: AnimatedIcons.menu_close,
         elevation: 8,

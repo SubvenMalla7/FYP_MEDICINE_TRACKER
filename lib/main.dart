@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import './screens/signUp_screen.dart';
 import 'model/medicine_prrovider.dart';
 import './model/auth.dart';
-//import './screens/add_medicines.dart';
 import './screens/tab_screen.dart';
 import './screens/medicines_screen.dart';
 import './screens/add_screen.dart';
@@ -13,13 +12,16 @@ import './screens/dashboard_screen.dart';
 import './screens/splash_screen.dart';
 import './screens/medcineScreen.dart';
 import './screens/user_profile.dart';
+import './screens/maps&phones.dart';
 
 void main() {
   runApp(MyApp());
 }
+// AIzaSyAtji8RF0OkgNMx4TGRPgVqgK7BBBSygtY
 
 class MyApp extends StatelessWidget {
   // This widget is the root of the application.
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
@@ -47,14 +49,6 @@ class MedicineApp extends StatelessWidget {
               authData.userId,
             ),
           ),
-          // ChangeNotifierProxyProvider<Auth, Medicines>(
-          //      create: (context) => Medicines('','', []),
-          //   //   var auth = Provider.of<Auth>(context);
-          //   //   Medicines(auth.token, []);
-          //   // },
-          //   update: (context, auth, updatedMedicines) => Medicines(auth.token,auth.userId,
-          //       updatedMedicines == null ? [] : updatedMedicines.items),
-          // ),
         ],
         child: Consumer<Auth>(
           builder: (ctx, auth, _) => MaterialApp(
@@ -87,6 +81,7 @@ class MedicineApp extends StatelessWidget {
               AddScreen.routeName: (ctx) => AddScreen(),
               SingleMedicine.routeName: (ctx) => SingleMedicine(),
               UserProfile.routeName: (ctx) => UserProfile(),
+              Map.routeName: (ctx) => Map(),
             },
           ),
         ));
