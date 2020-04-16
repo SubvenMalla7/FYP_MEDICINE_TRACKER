@@ -36,8 +36,8 @@ class Medicines with ChangeNotifier {
   }
 
   Future<void> fetchAndSetMeds() async {
-    final url = 'http://10.0.2.2:8000/api/medicine?api_token=$authtoken';
-    // const url='http://192.168.0.103:8000/api/medicine';
+    // final url = 'http://10.0.2.2:8000/api/medicine?api_token=$authtoken';
+    final url = 'http://192.168.0.103:8000/api/medicine?api_token=$authtoken';
     try {
       final response = await http.get(url, headers: headers);
       final extractedData = json.decode(response.body);
@@ -145,16 +145,15 @@ class Medicines with ChangeNotifier {
       //print('lol');
       notifyListeners();
     } catch (error) {
-      throw error;
+      //throw error;
     }
   }
 
   Future<void> addMedicines(Medicine medicine) async {
-    final url = 'http://10.0.2.2:8000/api/medicine?api_token=$authtoken';
+    final url = 'http://192.168.0.103:8000/api/medicine?api_token=$authtoken';
     // const url='http://192.168.0.103:8000/api/medicine';
 
-    var icon = medicine.icon;
-    print(icon.icon.codePoint);
+    print("icon.icon.codePoint");
     print(medicine.title);
     print(authtoken);
     print(id);
@@ -207,7 +206,8 @@ class Medicines with ChangeNotifier {
   Future<void> updateMedicine(String id, Medicine newMeds) async {
     print(newMeds.instruction);
     final medIndex = _items.indexWhere((meds) => meds.id == id);
-    final url = 'http://10.0.2.2:8000/api/medicine/$id?api_token=$authtoken';
+    final url =
+        'http://192.168.0.103:8000/api/medicine/$id?api_token=$authtoken';
     await http.put(
       url,
       body: ({
@@ -232,7 +232,8 @@ class Medicines with ChangeNotifier {
   }
 
   Future<void> deleteMeds(String id) async {
-    final url = 'http://10.0.2.2:8000/api/medicine/$id?api_token=$authtoken';
+    final url =
+        'http://192.168.0.103:8000/api/medicine/$id?api_token=$authtoken';
     // final url='http://192.168.0.103:8000/api/medicine/$id';
     final existingMedsIndex = _items.indexWhere((meds) => meds.id == id);
     var existingMedicine = _items[existingMedsIndex];
@@ -250,7 +251,8 @@ class Medicines with ChangeNotifier {
 ////////////////////////////////////////MEDICIENE LOG//////////////////////////////////////////////////
 
   Future<void> addMedicinesLog(MedicineLog medicineLog) async {
-    final url = 'http://10.0.2.2:8000/api/medicineLog?api_token=$authtoken';
+    final url =
+        'http://192.168.0.103:8000/api/medicineLog?api_token=$authtoken';
     // const url='http://192.168.0.103:8000/api/medicine';
 
     // try {

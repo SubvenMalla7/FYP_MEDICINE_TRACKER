@@ -8,6 +8,7 @@ import '../my_icons_icons.dart';
 import 'package:provider/provider.dart';
 import '../model/Medicine.dart';
 import '../model/medicine_prrovider.dart';
+import '../widgets/buildCard_widget.dart';
 
 class AddScreen extends StatefulWidget {
   static const routeName = '/add';
@@ -38,7 +39,6 @@ class _AddScreenState extends State<AddScreen> {
     type: '',
   );
   String _freqencyItemSelected = 'Once a day';
-  String _currentUnitSelected = 'tablet(s)';
   String _instruction = "Doesn't matter";
   TimeOfDay _time = TimeOfDay.now();
   double dose = 0;
@@ -81,28 +81,7 @@ class _AddScreenState extends State<AddScreen> {
   var _isLoading = false;
   FlutterLocalNotificationsPlugin localNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
-  Widget buildCard({child}) {
-    return Card(
-      margin: const EdgeInsets.all(10),
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Container(padding: EdgeInsets.all(15), child: child),
-    );
-  }
-
-  TextStyle textStyle() {
-    return TextStyle(
-        color: Colors.black54, fontSize: 18, fontWeight: FontWeight.bold);
-  }
-
-  TextStyle headingStyle() {
-    return TextStyle(
-        fontWeight: FontWeight.w600,
-        fontSize: 20,
-        color: Theme.of(context).primaryColor);
-  }
+  //
 
   Widget _myRadioButton({String title, int value, Function onChanged}) {
     return RadioListTile(
@@ -197,23 +176,9 @@ class _AddScreenState extends State<AddScreen> {
             .addMedicines(_editedMedicine);
       } catch (error) {
         await showDialog(
-            context: context,
-            builder: (ctx) => AlertDialog(
-                  title: Text('An unexpected error occured'),
-                  content: Text('Somthing went error'),
-                  actions: <Widget>[
-                    FlatButton(
-                      child: Text(
-                        'Okay',
-                        style: TextStyle(
-                            color: Theme.of(context).accentColor, fontSize: 18),
-                      ),
-                      onPressed: () {
-                        Navigator.of(ctx).pop();
-                      },
-                    )
-                  ],
-                ));
+          context: context,
+          builder: (ctx) => alert(context),
+        );
       }
       // finally {
       //   setState(() {
@@ -274,36 +239,32 @@ class _AddScreenState extends State<AddScreen> {
     );
   }
 
-  Future<Null> _selectdate(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
-      context: context,
-      initialDate: dateTime,
-      firstDate: dateTime.subtract(new Duration(days: 3650)),
-      lastDate: dateTime.add(new Duration(days: 3650)),
-    );
-
-    if (picked != null && picked != dateTime) {
-      setState(
-        () {
-          dateTime = picked;
-          _editedMedicine = Medicine(
-            id: _editedMedicine.id,
-            title: _editedMedicine.title,
-            amount: _editedMedicine.id != null ? _editedMedicine.amount : dose,
-            time: _time.format(context),
-            icon: Icon(
-              _icon,
-              color: _iconColor,
-            ),
-            color: _iconColor.value,
-            instruction: _editedMedicine.instruction,
-            date: DateFormat("yyyy-MM-dd").format(dateTime),
-            note: _editedMedicine.note,
-            type: selectedUnit,
-          );
-        },
-      );
-    }
+  void _selectdate(BuildContext context) {
+    selectdate(context, dateTime).then((DateTime picked) {
+      if (picked != null && picked != dateTime) {
+        setState(
+          () {
+            dateTime = picked;
+            _editedMedicine = Medicine(
+              id: _editedMedicine.id,
+              title: _editedMedicine.title,
+              amount:
+                  _editedMedicine.id != null ? _editedMedicine.amount : dose,
+              time: _time.format(context),
+              icon: Icon(
+                _icon,
+                color: _iconColor,
+              ),
+              color: _iconColor.value,
+              instruction: _editedMedicine.instruction,
+              date: DateFormat("yyyy-MM-dd").format(dateTime),
+              note: _editedMedicine.note,
+              type: selectedUnit,
+            );
+          },
+        );
+      }
+    });
   }
 
   Future<Null> _selectDays(BuildContext context) async {
@@ -470,7 +431,7 @@ class _AddScreenState extends State<AddScreen> {
                                   padding: const EdgeInsets.only(bottom: 15),
                                   child: Text(
                                     'Instructions',
-                                    style: headingStyle(),
+                                    style: headingStyle(context),
                                   ),
                                 ),
                                 Divider(
@@ -654,7 +615,7 @@ class _AddScreenState extends State<AddScreen> {
                               children: <Widget>[
                                 Text(
                                   'Reminder Times',
-                                  style: headingStyle(),
+                                  style: headingStyle(context),
                                 ),
                                 Divider(
                                   color: Colors.grey,
@@ -672,30 +633,18 @@ class _AddScreenState extends State<AddScreen> {
                                             style: textStyle(),
                                           ),
                                           Container(
-                                            //width: double.infinity,
-                                            child: DropdownButton<String>(
-                                              items: _frequecies.map(
-                                                  (String selectedFreqency) {
-                                                return DropdownMenuItem<String>(
-                                                  value: selectedFreqency,
-                                                  child: Text(
-                                                    selectedFreqency,
-                                                    style: TextStyle(
-                                                        color: color,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
-                                                );
-                                              }).toList(),
-                                              onChanged: (String newValue) {
+                                            child: dropDown(
+                                              _frequecies,
+                                              color,
+                                              _freqencyItemSelected,
+                                              (String newValue) {
                                                 setState(() {
                                                   this._freqencyItemSelected =
                                                       newValue;
                                                 });
                                               },
-                                              value: _freqencyItemSelected,
                                             ),
-                                          ),
+                                          )
                                         ],
                                       ),
                                     ],
@@ -803,30 +752,14 @@ class _AddScreenState extends State<AddScreen> {
                                                 },
                                               ),
                                               Container(
-                                                child: DropdownButton<String>(
-                                                  items:
-                                                      _unit.map((selectedUnit) {
-                                                    return DropdownMenuItem<
-                                                        String>(
-                                                      value: selectedUnit,
-                                                      child: Text(
-                                                        selectedUnit,
-                                                        style: TextStyle(
-                                                            color: color,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .bold),
-                                                      ),
-                                                    );
-                                                  }).toList(),
-                                                  onChanged: (String newValue) {
-                                                    setState(() {
-                                                      this._currentUnitSelected =
-                                                          newValue;
-                                                    });
-                                                  },
-                                                  value: _currentUnitSelected,
-                                                ),
+                                                child: dropDown(
+                                                    _unit, color, selectedUnit,
+                                                    (String newValue) {
+                                                  setState(() {
+                                                    this.selectedUnit =
+                                                        newValue;
+                                                  });
+                                                }),
                                               ),
                                             ],
                                           ),
@@ -844,7 +777,7 @@ class _AddScreenState extends State<AddScreen> {
                               children: <Widget>[
                                 Text(
                                   'Schedule',
-                                  style: headingStyle(),
+                                  style: headingStyle(context),
                                 ),
                                 Container(
                                   padding: const EdgeInsets.all(18),
@@ -931,7 +864,7 @@ class _AddScreenState extends State<AddScreen> {
                                 padding: const EdgeInsets.only(bottom: 15.0),
                                 child: Text(
                                   'Medicine Icon',
-                                  style: headingStyle(),
+                                  style: headingStyle(context),
                                 ),
                               ),
                               Container(
@@ -1127,10 +1060,11 @@ class _AddScreenState extends State<AddScreen> {
     print('Channel-Id $hashcode');
     var iosChannel = IOSNotificationDetails();
     var platformChannel = NotificationDetails(androidChannel, iosChannel);
-    plugin.
-    // periodicallyShow(
-    //     hashcode, message, subText, interval, platformChannel);
-    schedule(hashcode, message, subText, date, platformChannel,
-        payload: hashCode.toString());
+    plugin
+        .
+        // periodicallyShow(
+        //     hashcode, message, subText, interval, platformChannel);
+        schedule(hashcode, message, subText, date, platformChannel,
+            payload: hashCode.toString());
   }
 }

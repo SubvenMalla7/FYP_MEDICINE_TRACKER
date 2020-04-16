@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:test_dasd/model/auth.dart';
 
 import './medicines_screen.dart';
 import './dashboard_screen.dart';
 import './user_profile.dart';
-import '../widgets/app_drawer.dart';
 
 class TabsScreen extends StatefulWidget {
   static const routeName = '/tab_screen';
@@ -14,6 +15,16 @@ class TabsScreen extends StatefulWidget {
 class _TabsScreenState extends State<TabsScreen> {
   List<Map<String, Object>> _pages;
   int _selectedPageIndex = 0;
+  var isLoading = true;
+
+  @override
+  void didChangeDependencies() {
+    final data = Provider.of<Auth>(context).fetchUserData();
+    print(data);
+    print('sdas');
+    isLoading = false;
+    super.didChangeDependencies();
+  }
 
   @override
   void initState() {
@@ -28,9 +39,8 @@ class _TabsScreenState extends State<TabsScreen> {
       },
       {
         'page': UserProfile(),
-        'title': 'Add Medicines',
+        'title': 'More',
       },
-     
     ];
     super.initState();
   }
@@ -44,7 +54,6 @@ class _TabsScreenState extends State<TabsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: AppDrawer(),
       body: _pages[_selectedPageIndex]['page'],
       bottomNavigationBar: BottomNavigationBar(
         elevation: 10,
@@ -71,12 +80,14 @@ class _TabsScreenState extends State<TabsScreen> {
               style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
             ),
           ),
-          BottomNavigationBarItem(
-            backgroundColor: Theme.of(context).primaryColor,
-            icon: Icon(Icons.person_outline),
-            title: Text('Profile',
-             style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),),
-          ),
+          // BottomNavigationBarItem(
+          //   backgroundColor: Theme.of(context).primaryColor,
+          //   icon: Icon(Icons.more_horiz),
+          //   title: Text(
+          //     'More',
+          //     style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+          //   ),
+          // ),
         ],
       ),
     );

@@ -3,13 +3,17 @@ import 'dart:convert';
 import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:test_dasd/model/User.dart';
 import './http_exception.dart';
-
-import './User.dart';
 
 class Auth with ChangeNotifier {
   String token;
   String userId;
+  String userName;
+  String email;
+  String name;
+
+  final List<User> loadedUserData = [];
 
   Map<String, String> headers = {
     'Content-type': 'application/json',
@@ -27,19 +31,14 @@ class Auth with ChangeNotifier {
     return null;
   }
 
-  List<User> items = [];
-
-  // List<User> get items {
-  //   return [..._items];
-  // }
-
   String get userid {
     return userId;
   }
+  
 
   Future<void> _authenticate(
       String email, String password, String urlSegment) async {
-    final url = 'http://10.0.2.2:8000/api/$urlSegment';
+    final url = 'http://192.168.0.103:8000/api/$urlSegment';
     try {
       final response = await http.post(
         url,
@@ -107,18 +106,42 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> fetchUserData() async {
-    final url = 'http://10.0.2.2:8000/api/userData?api_token=$token';
+    final url = 'http://192.168.0.103:8000/api/userData?api_token=$token';
     // const url='http://192.168.0.103:8000/api/medicine';
     try {
       final response = await http.get(url, headers: headers);
       final extractedData = json.decode(response.body);
-      items.add(User(
-        id: extractedData['id'].toString(),
-        name: extractedData['name'],
-        email: extractedData['email'],
-      ));
+      loadedUserData.add(User(name: extractedData['name']));
+      name = extractedData['name'];
+      email = extractedData['email'];
     } catch (error) {
       throw error;
     }
+  }
+
+  Future<void> updateUserInfo(int id, User newUsers) async {
+    print(newUsers.gender);
+    print(token);
+    // final userIndex = loadedUserData.indexWhere((users) => users.id == id);
+    final url = 'http://192.168.0.103:8000/api/updateUser?api_token=$token';
+    await http.put(
+      url,
+      body: ({
+        "name": newUsers.name,
+        "email": newUsers.email,
+        "phone": newUsers.phone,
+        "age": newUsers.age,
+        "gender": newUsers.gender,
+        "conditions": newUsers.condition,
+      }),
+    );
+    print('done');
+    notifyListeners();
+    // if (userIndex >= 0) {
+    //   loadedUserData[userIndex] = newUsers;
+    //
+    // } else {
+    //   print('....');
+    // }
   }
 }

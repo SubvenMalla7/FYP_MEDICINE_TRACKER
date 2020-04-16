@@ -1,21 +1,21 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class User with ChangeNotifier {
-  String id;
-  String name;
-  // String dob;
-  // int age;
-  // String gender;
-  // String sex;
-  String email;
+  final int id;
+  final String name;
+  final String email;
+  final String phone;
+  final String age;
+  final String gender;
+  final String condition;
 
   User({
-    @required this.id,
-    @required this.name,
-    // @required this.dob,
-    // @required this.age,
-    // @required this.gender,
-    // @required this.sex,
-    @required this.email,
+    this.id,
+    this.name,
+    this.email,
+    this.phone,
+    this.age,
+    this.gender,
+    this.condition,
   });
 }

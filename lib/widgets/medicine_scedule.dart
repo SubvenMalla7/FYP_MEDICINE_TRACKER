@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 
+
 import '../model/medicine_prrovider.dart';
 import '../model/Medicine.dart';
 import '../model/MedicineLog.dart';
@@ -27,6 +28,7 @@ class _MedicineSceduleState extends State<MedicineScedule> {
     status: '',
     reasons: '',
   );
+
   initializeNotification() async {
     var initiallizeAndroid = AndroidInitializationSettings('ic_launcher');
     var initiallizeIOS = IOSInitializationSettings();
@@ -102,6 +104,7 @@ class _MedicineSceduleState extends State<MedicineScedule> {
     final medicine = Provider.of<Medicine>(context);
     var time = TimeOfDay.now();
     int min;
+    print('this is medicine color ${medicine.title}');
 
     Future<void> notification() async {
       DateTime now = DateTime.now().toUtc().add(Duration(minutes: min));
@@ -132,7 +135,7 @@ class _MedicineSceduleState extends State<MedicineScedule> {
               title: medicine.title,
               amount: medicine.amount,
               time: time.format(context),
-              date: medicine.date,
+              date: DateTime.now().toString(),
               status: 'Taken',
               reasons: reasons,
             );
@@ -149,7 +152,7 @@ class _MedicineSceduleState extends State<MedicineScedule> {
     Widget taken() {
       return Container(
         color: Theme.of(context).primaryColor,
-        height: 150,
+        height: 280,
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: Column(
@@ -168,12 +171,13 @@ class _MedicineSceduleState extends State<MedicineScedule> {
                 height: 10,
               ),
               FlatButton(
+                  textColor: Colors.white,
                   onPressed: () {
                     _medicineLog = MedicineLog(
                       title: medicine.title,
                       amount: medicine.amount,
                       time: medicine.time,
-                      date: medicine.date,
+                      date: DateTime.now().toString(),
                       status: 'Taken',
                       reasons: reasons,
                     );
@@ -187,13 +191,13 @@ class _MedicineSceduleState extends State<MedicineScedule> {
               SizedBox(
                 height: 10,
               ),
-              InkWell(
-                onTap: () {
+              FlatButton(
+                onPressed: () {
                   _medicineLog = MedicineLog(
                     title: medicine.title,
                     amount: medicine.amount,
                     time: time.format(context),
-                    date: time.format(context),
+                    date: DateTime.now().toString(),
                     status: 'Taken',
                     reasons: reasons,
                   );
@@ -209,8 +213,8 @@ class _MedicineSceduleState extends State<MedicineScedule> {
               SizedBox(
                 height: 10,
               ),
-              InkWell(
-                onTap: () => _selectTime(context),
+              FlatButton(
+                onPressed: () => _selectTime(context),
                 child: Text('Pick Specific Time'),
               ),
             ],
@@ -221,7 +225,7 @@ class _MedicineSceduleState extends State<MedicineScedule> {
 
     Widget snoozed() {
       return Container(
-        height: 150,
+        height: 280,
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: Column(
@@ -236,8 +240,8 @@ class _MedicineSceduleState extends State<MedicineScedule> {
               SizedBox(
                 height: 10,
               ),
-              InkWell(
-                onTap: () {
+              FlatButton(
+                onPressed: () {
                   setState(() {
                     min = 5;
                   });
@@ -249,8 +253,8 @@ class _MedicineSceduleState extends State<MedicineScedule> {
               SizedBox(
                 height: 10,
               ),
-              InkWell(
-                onTap: () {
+              FlatButton(
+                onPressed: () {
                   setState(() {
                     min = 10;
                   });
@@ -262,8 +266,8 @@ class _MedicineSceduleState extends State<MedicineScedule> {
               SizedBox(
                 height: 10,
               ),
-              InkWell(
-                onTap: () {
+              FlatButton(
+                onPressed: () {
                   setState(() {
                     min = 30;
                   });
@@ -275,8 +279,8 @@ class _MedicineSceduleState extends State<MedicineScedule> {
               SizedBox(
                 height: 10,
               ),
-              InkWell(
-                onTap: () {
+              FlatButton(
+                onPressed: () {
                   setState(() {
                     min = 60;
                   });
@@ -293,7 +297,7 @@ class _MedicineSceduleState extends State<MedicineScedule> {
 
     Widget skipped() {
       return Container(
-        height: 150,
+        height: 280,
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: Column(
@@ -308,8 +312,8 @@ class _MedicineSceduleState extends State<MedicineScedule> {
               SizedBox(
                 height: 10,
               ),
-              InkWell(
-                onTap: () {
+              FlatButton(
+                onPressed: () {
                   setState(() {
                     reasons = "Medicine isn't near me";
                   });
@@ -317,7 +321,7 @@ class _MedicineSceduleState extends State<MedicineScedule> {
                     title: medicine.title,
                     amount: medicine.amount,
                     time: medicine.time,
-                    date: medicine.date,
+                    date: DateTime.now().toString(),
                     status: 'Skipped',
                     reasons: reasons,
                   );
@@ -329,8 +333,8 @@ class _MedicineSceduleState extends State<MedicineScedule> {
               SizedBox(
                 height: 10,
               ),
-              InkWell(
-                onTap: () {
+              FlatButton(
+                onPressed: () {
                   setState(() {
                     reasons = "Forgot/ busy/Asleep";
                   });
@@ -338,20 +342,20 @@ class _MedicineSceduleState extends State<MedicineScedule> {
                     title: medicine.title,
                     amount: medicine.amount,
                     time: time.format(context),
-                    date: time.format(context),
+                    date: DateTime.now().toString(),
                     status: 'Skipped',
                     reasons: reasons,
                   );
                   _save(context);
-                  Navigator.of(context);
+                  Navigator.of(context).pop();
                 },
                 child: Text('Forgot/ busy/Asleep'),
               ),
               SizedBox(
                 height: 10,
               ),
-              InkWell(
-                onTap: () {
+              FlatButton(
+                onPressed: () {
                   setState(() {
                     reasons = "Ran out of the medicine";
                   });
@@ -359,12 +363,12 @@ class _MedicineSceduleState extends State<MedicineScedule> {
                     title: medicine.title,
                     amount: medicine.amount,
                     time: time.format(context),
-                    date: time.format(context),
+                    date: DateTime.now().toString(),
                     status: 'Skipped',
                     reasons: reasons,
                   );
                   _save(context);
-                  Navigator.of(context);
+                  Navigator.of(context).pop();
                 },
                 child: Text('Ran out of the medicine'),
               ),
@@ -374,7 +378,7 @@ class _MedicineSceduleState extends State<MedicineScedule> {
       );
     }
 
-    Future<void> _startNewTransactions(BuildContext ctx) {
+    Future<void> _action(BuildContext ctx) {
       return showModalBottomSheet(
         context: ctx,
         builder: (_) {
@@ -472,7 +476,7 @@ class _MedicineSceduleState extends State<MedicineScedule> {
                                   ),
                                   iconSize: 35,
                                   onPressed: () {
-                                    _startNewTransactions(context);
+                                    _action(context);
 
                                     setState(() {
                                       status = "Taken";
@@ -490,13 +494,11 @@ class _MedicineSceduleState extends State<MedicineScedule> {
                             Column(
                               children: <Widget>[
                                 IconButton(
-                                  icon: Icon(
-                                    Icons.snooze,
-                                    color: Colors.yellowAccent,
-                                  ),
+                                  icon: Icon(Icons.snooze,
+                                      color: Color.fromRGBO(240, 208, 0, 1)),
                                   iconSize: 35,
                                   onPressed: () {
-                                    _startNewTransactions(context);
+                                    _action(context);
                                     setState(() {
                                       status = 'Snoozed';
                                       text = 'Snoozed';
@@ -519,7 +521,7 @@ class _MedicineSceduleState extends State<MedicineScedule> {
                                   ),
                                   iconSize: 35,
                                   onPressed: () {
-                                    _startNewTransactions(context);
+                                    _action(context);
 
                                     setState(() {
                                       status = 'cancel';

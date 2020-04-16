@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-
-import 'package:test_dasd/widgets/app_drawer.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../widgets/medicine_scedule.dart';
@@ -11,6 +9,7 @@ import '../model/medicine_prrovider.dart';
 import '../screens/maps&phones.dart';
 import '../screens/add_screen.dart';
 import '../my_icons_icons.dart';
+import '../widgets/app_drawer.dart';
 
 class DashBoardScreen extends StatefulWidget {
   static const routeName = '/dashboard';
@@ -35,7 +34,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
   @override
   Widget build(BuildContext context) {
     final medicine = Provider.of<Medicines>(context);
-
+    print('this is ${medicine.items.length}');
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,

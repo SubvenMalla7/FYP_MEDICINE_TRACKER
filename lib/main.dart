@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import './screens/signUp_screen.dart';
 import 'model/medicine_prrovider.dart';
 import './model/auth.dart';
 import './screens/tab_screen.dart';
@@ -13,6 +12,8 @@ import './screens/splash_screen.dart';
 import './screens/medcineScreen.dart';
 import './screens/user_profile.dart';
 import './screens/maps&phones.dart';
+import './screens/measurements.dart';
+import './screens/addUserDetails.dart';
 
 void main() {
   runApp(MyApp());
@@ -37,12 +38,6 @@ class MedicineApp extends StatelessWidget {
     final authData = Provider.of<Auth>(context);
     return MultiProvider(
         providers: [
-          ChangeNotifierProvider.value(
-            value: Medicines(
-              authData.token,
-              authData.userId,
-            ),
-          ),
           ChangeNotifierProvider.value(
             value: Medicines(
               authData.token,
@@ -74,14 +69,14 @@ class MedicineApp extends StatelessWidget {
             routes: {
               DashBoardScreen.routeName: (ctx) => DashBoardScreen(),
               AuthScreen.routeName: (ctx) => AuthScreen(),
-              SignUp.routeName: (ctx) => SignUp(),
-              // AddMedicinesScreen.routeName: (ctx) => AddMedicinesScreen(),
               MedicineScreen.routeName: (ctx) => MedicineScreen(),
               TabsScreen.routeName: (ctx) => TabsScreen(),
               AddScreen.routeName: (ctx) => AddScreen(),
               SingleMedicine.routeName: (ctx) => SingleMedicine(),
               UserProfile.routeName: (ctx) => UserProfile(),
               Map.routeName: (ctx) => Map(),
+              Measurement.routeName: (ctx) => Measurement(),
+              AddUserDetails.routeName: (ctx) => AddUserDetails(),
             },
           ),
         ));

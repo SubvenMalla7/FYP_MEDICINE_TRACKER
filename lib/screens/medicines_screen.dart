@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:test_dasd/screens/medcineScreen.dart';
 
-import 'package:test_dasd/widgets/app_drawer.dart';
 import '../widgets/user_medicines.dart';
 import '../model/medicine_prrovider.dart';
 
@@ -34,7 +33,6 @@ class MedicineScreen extends StatelessWidget {
         child: Icon(Icons.add),
         onPressed: () => Navigator.of(context).pushNamed(AddScreen.routeName),
       ),
-      drawer: AppDrawer(),
       body: RefreshIndicator(
         onRefresh: () => _refreshMedicines(context),
         child: Container(
