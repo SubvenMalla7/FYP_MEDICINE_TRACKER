@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 
-
 import '../model/medicine_prrovider.dart';
 import '../model/Medicine.dart';
 import '../model/MedicineLog.dart';
@@ -435,7 +434,7 @@ class _MedicineSceduleState extends State<MedicineScedule> {
                       backgroundColor: medicine.color == Colors.white70.value
                           ? Colors.black87
                           : Colors.black12,
-                      child: medicine.icon,
+                      child: Hero(tag: medicine.id, child: medicine.icon),
                     ),
                   ),
                   title: Padding(
@@ -462,7 +461,7 @@ class _MedicineSceduleState extends State<MedicineScedule> {
                       child: Container(
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(width: 2, color: Colors.black)),
+                            border: Border.all(width: 1, color: Colors.grey)),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.spaceAround,

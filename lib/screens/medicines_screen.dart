@@ -72,11 +72,13 @@ class MedicineScreen extends StatelessWidget {
                       },
                       child: Column(
                         children: <Widget>[
-                          UserMedicines(
-                            medicineData.items[i].id,
-                            medicineData.items[i].icon,
-                            medicineData.items[i].title,
-                            medicineData.items[i].color,
+                          Hero(
+                              tag: medicineData.items[i].id,                        child: UserMedicines(
+                              medicineData.items[i].id,
+                              medicineData.items[i].icon,
+                              medicineData.items[i].title,
+                              medicineData.items[i].color,
+                            ),
                           ),
                           Divider(
                             thickness: 2,

@@ -16,13 +16,18 @@ class _TabsScreenState extends State<TabsScreen> {
   List<Map<String, Object>> _pages;
   int _selectedPageIndex = 0;
   var isLoading = true;
+  bool isInt = true;
 
   @override
   void didChangeDependencies() {
-    final data = Provider.of<Auth>(context).fetchUserData();
-    print(data);
-    print('sdas');
-    isLoading = false;
+    if (isInt) {
+      final data = Provider.of<Auth>(context).fetchUserData();
+      print(data);
+      print('sdas');
+      isLoading = false;
+      isInt = false;
+    }
+
     super.didChangeDependencies();
   }
 

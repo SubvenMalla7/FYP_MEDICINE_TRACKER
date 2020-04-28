@@ -12,8 +12,16 @@ class Auth with ChangeNotifier {
   String userName;
   String email;
   String name;
+  String phone;
+  String age;
+  String gender;
+  String condition;
 
-  final List<User> loadedUserData = [];
+  List<User> _userData = [];
+
+  List<User> get userData {
+    return [..._userData];
+  }
 
   Map<String, String> headers = {
     'Content-type': 'application/json',
@@ -34,7 +42,10 @@ class Auth with ChangeNotifier {
   String get userid {
     return userId;
   }
-  
+
+  User findById(int id) {
+    return _userData.firstWhere((user) => user.id == id);
+  }
 
   Future<void> _authenticate(
       String email, String password, String urlSegment) async {
@@ -53,11 +64,10 @@ class Auth with ChangeNotifier {
         ),
       );
       final responseData = json.decode(response.body);
-      print('object');
-      print(responseData);
-      //print(responseData['errors']);
+      print(responseData['errors']);
+
       if (responseData['errors'] != null) {
-        print('hello');
+        print('hellodfsdf');
         throw HttpException(responseData['errors']);
       }
       token = responseData['token'];
@@ -67,11 +77,7 @@ class Auth with ChangeNotifier {
       final pref = await SharedPreferences.getInstance();
       final userData = json.encode({'token': token, 'user_id': userId});
       pref.setString('user', userData);
-      print('subven');
-      print(pref.getString('user'));
     } catch (error) {
-      print(userId);
-      print(error);
       throw error;
     }
   }
@@ -107,20 +113,37 @@ class Auth with ChangeNotifier {
 
   Future<void> fetchUserData() async {
     final url = 'http://192.168.0.103:8000/api/userData?api_token=$token';
-    // const url='http://192.168.0.103:8000/api/medicine';
     try {
       final response = await http.get(url, headers: headers);
       final extractedData = json.decode(response.body);
-      loadedUserData.add(User(name: extractedData['name']));
+      _userData.add(
+        User(
+            id: extractedData['id'],
+            name: extractedData['name'],
+            email: extractedData['email'],
+            phone: extractedData['phone'],
+            age: extractedData['age'],
+            gender: extractedData['gender'],
+            condition: extractedData['conditions']),
+      );
       name = extractedData['name'];
       email = extractedData['email'];
+      phone = extractedData['phone'];
+      age = extractedData['age'];
+      gender = extractedData['gender'];
+      condition = extractedData['conditions'];
+
+      name = extractedData['name'];
+      email = extractedData['email'];
+
+      //notifyListeners();
     } catch (error) {
       throw error;
     }
   }
 
   Future<void> updateUserInfo(int id, User newUsers) async {
-    print(newUsers.gender);
+    print(newUsers.condition);
     print(token);
     // final userIndex = loadedUserData.indexWhere((users) => users.id == id);
     final url = 'http://192.168.0.103:8000/api/updateUser?api_token=$token';
@@ -143,5 +166,18 @@ class Auth with ChangeNotifier {
     // } else {
     //   print('....');
     // }
+  }
+
+  Future<void> deleteuser(int id) async {
+    final url = 'http://192.168.0.103:8000/api/deleteUser?api_token=$token';
+    final existingUserIndex = _userData.indexWhere((user) => user.id == id);
+    _userData.removeAt(existingUserIndex);
+    await http.delete(url, headers: headers);
+
+    token = null;
+    userId = null;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    prefs.remove('user');
   }
 }

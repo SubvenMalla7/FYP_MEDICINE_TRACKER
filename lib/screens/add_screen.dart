@@ -177,7 +177,8 @@ class _AddScreenState extends State<AddScreen> {
       } catch (error) {
         await showDialog(
           context: context,
-          builder: (ctx) => alert(context),
+          builder: (ctx) =>
+              alert(context, 'An Error Occurred', 'Please try again!'),
         );
       }
       // finally {

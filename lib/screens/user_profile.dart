@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:test_dasd/screens/addUserDetails.dart';
+import '../widgets/buildCard_widget.dart';
+
+import '../screens/addUserDetails.dart';
 
 import '../model/auth.dart';
 
@@ -12,16 +14,13 @@ class UserProfile extends StatefulWidget {
 }
 
 class _UserProfileState extends State<UserProfile> {
-  bool _isInit = true;
   @override
   void didChangeDependencies() {
-    if (_isInit) {
-      Provider.of<Auth>(context).fetchUserData();
-      _isInit = false;
-      setState(() {
-        
-      });
-    }
+    Provider.of<Auth>(context).fetchUserData();
+    final user = Provider.of<Auth>(context);
+    print("hekko");
+    print(user.userData.length);
+
     super.didChangeDependencies();
   }
 
@@ -36,8 +35,9 @@ class _UserProfileState extends State<UserProfile> {
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.edit),
-            onPressed: () =>
-                Navigator.of(context).pushNamed(AddUserDetails.routeName,arguments: userData.userId),
+            onPressed: () => Navigator.of(context).pushNamed(
+                AddUserDetails.routeName,
+                arguments: int.parse(userData.userId)),
           )
         ],
       ),
@@ -95,37 +95,28 @@ class _UserProfileState extends State<UserProfile> {
                       children: <Widget>[
                         ExtendedInfoTab(
                           fieldTitle: "Gender",
-                          fieldInfo: "Not Specified",
-                          // medicine.time,
+                          fieldInfo: userData.gender == null
+                              ? 'Not Specified'
+                              : userData.gender,
                         ),
                         SizedBox(
                           width: 90,
                         ),
                         ExtendedInfoTab(
                           fieldTitle: "Age ",
-                          fieldInfo: "Not Specified",
+                          fieldInfo: userData.age == null
+                              ? 'Not Specified'
+                              : userData.age,
                         )
                         // medicine.date.toString()),
                       ],
                     ),
-                    Row(
-                      children: <Widget>[
-                        ExtendedInfoTab(
-                          fieldTitle: "Sex",
-                          fieldInfo: "Not Specified",
-                          // medicine.amount.toString(),
-                        ),
-                        SizedBox(
-                          width: 90,
-                        ),
-                        ExtendedInfoTab(
-                            fieldTitle: "Date Of Birth",
-                            fieldInfo: '2020/02/05'),
-                      ],
-                    ),
                     ExtendedInfoTab(
-                        fieldTitle: 'Medical Conditions:',
-                        fieldInfo: 'No Medical info')
+                      fieldTitle: 'Medical Conditions:',
+                      fieldInfo: userData.condition == null
+                          ? 'Not Specified'
+                          : userData.condition,
+                    )
                   ],
                 ),
               ),
@@ -139,6 +130,32 @@ class _UserProfileState extends State<UserProfile> {
                   right: MediaQuery.of(context).size.height * 0.06,
                   top: 25,
                 ),
+              ),
+              IconButton(
+                highlightColor: Theme.of(context).accentColor,
+                splashColor: Theme.of(context).primaryColor,
+                icon: Icon(
+                  Icons.delete,
+                  color: Theme.of(context).errorColor,
+                ),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (ctx) => deleteDialog(
+                      context,
+                      "Are You sure you want to delete account? ?",
+                      () async {
+                        try {
+                          await Provider.of<Auth>(context, listen: false)
+                              .deleteuser(int.parse(userData.userId));
+                          Navigator.of(context).pushReplacementNamed('/');
+                        } catch (error) {
+                          print('This is an eror $error');
+                        }
+                      },
+                    ),
+                  );
+                },
               ),
             ],
           ),

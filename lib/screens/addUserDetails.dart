@@ -17,6 +17,7 @@ class _AddUserDetailsState extends State<AddUserDetails> {
   List genders = ['Male', 'Female', 'Others'];
   final form = GlobalKey<FormState>();
   bool _isLoading = false;
+  bool inIt = true;
 
   var _editedData = User(
     id: null,
@@ -55,7 +56,8 @@ class _AddUserDetailsState extends State<AddUserDetails> {
     } catch (error) {
       await showDialog(
         context: context,
-        builder: (ctx) => alert(context),
+        builder: (ctx) =>
+            alert(context, 'An Error Occurred', 'Please try again!'),
       );
     }
     // finally {
@@ -70,6 +72,19 @@ class _AddUserDetailsState extends State<AddUserDetails> {
     });
 
     Navigator.of(context).pop();
+  }
+
+  @override
+  void didChangeDependencies() {
+    if (inIt) {
+      final userId = ModalRoute.of(context).settings.arguments as int;
+      if (userId != null) {
+        _editedData =
+            Provider.of<Auth>(context, listen: false).findById(userId);
+      }
+    }
+    inIt = false;
+    super.didChangeDependencies();
   }
 
   @override
@@ -231,7 +246,10 @@ class _AddUserDetailsState extends State<AddUserDetails> {
                       buildCard(
                         child: Column(
                           children: <Widget>[
-                            buildForm(_editedData.condition,'Medical Conditions (if any)', '',
+                            buildForm(
+                                _editedData.condition,
+                                'Medical Conditions (if any)',
+                                '',
                                 TextInputType.multiline, (value) {
                               _editedData = User(
                                 id: _editedData.id,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:test_dasd/screens/medicines_screen.dart';
+import 'package:test_dasd/widgets/buildCard_widget.dart';
 
 import '../model/Medicine.dart';
 import '../model/medicine_prrovider.dart';
@@ -146,48 +147,23 @@ class SingleMedicine extends StatelessWidget {
                     shape: StadiumBorder(),
                     onPressed: () {
                       showDialog(
-                          context: context,
-                          builder: (ctx) => AlertDialog(
-                                elevation: 10,
-                                title: Text('Are you sure?'),
-                                content: Text(
-                                  'Do you want to delete ${medicine.title}?',
-                                  style: TextStyle(fontSize: 18),
-                                ),
-                                actions: <Widget>[
-                                  FlatButton(
-                                    onPressed: () async {
-                                      try {
-                                        await Provider.of<Medicines>(context,
-                                                listen: false)
-                                            .deleteMeds(medicine.id);
-                                        Navigator.of(context)
-                                            .pushReplacementNamed(
-                                                MedicineScreen.routeName);
-                                      } catch (error) {
-                                        print('This is an eror $error');
-                                      }
-                                    },
-                                    child: Text(
-                                      'Yes',
-                                      style: TextStyle(
-                                          fontSize: 18,
-                                          color:
-                                              Theme.of(context).primaryColor),
-                                    ),
-                                  ),
-                                  FlatButton(
-                                    onPressed: () =>
-                                        Navigator.of(context).pop(),
-                                    child: Text(
-                                      'No',
-                                      style: TextStyle(
-                                          fontSize: 18,
-                                          color: Theme.of(context).accentColor),
-                                    ),
-                                  ),
-                                ],
-                              ));
+                        context: context,
+                        builder: (ctx) => deleteDialog(
+                          context,
+                          "Do You want to delete ${medicine.title} ?",
+                          () async {
+                            try {
+                              await Provider.of<Medicines>(context,
+                                      listen: false)
+                                  .deleteMeds(medicine.id);
+                              Navigator.of(context).pushReplacementNamed(
+                                  MedicineScreen.routeName);
+                            } catch (error) {
+                              print('This is an eror $error');
+                            }
+                          },
+                        ),
+                      );
                     },
                     child: Center(
                       child: Text(

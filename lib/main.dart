@@ -14,6 +14,7 @@ import './screens/user_profile.dart';
 import './screens/maps&phones.dart';
 import './screens/measurements.dart';
 import './screens/addUserDetails.dart';
+import './screens/signupLoginup.dart';
 
 void main() {
   runApp(MyApp());
@@ -64,7 +65,7 @@ class MedicineApp extends StatelessWidget {
                         authResultSnapShot.connectionState ==
                                 ConnectionState.waiting
                             ? SplashScreen()
-                            : AuthScreen(),
+                            : LoginSign(),
                   ),
             routes: {
               DashBoardScreen.routeName: (ctx) => DashBoardScreen(),

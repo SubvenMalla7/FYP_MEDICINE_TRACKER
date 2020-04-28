@@ -15,7 +15,6 @@ class Map extends StatefulWidget {
 class _MapState extends State<Map> {
   Completer<GoogleMapController> _controller = Completer();
   var currentLocation;
-  Future<void> _launched;
   String _phone = '103';
 
   @override
@@ -38,7 +37,8 @@ class _MapState extends State<Map> {
     }
   }
 
-  Future<void> _makePhoneCall(String url) async {
+  _makePhoneCall() async {
+    var url = 'tel:$_phone';
     if (await canLaunch(url)) {
       await launch(url);
     } else {
@@ -64,7 +64,7 @@ class _MapState extends State<Map> {
                   color: Theme.of(context).accentColor,
                 ),
                 onPressed: () => setState(() {
-                  _launched = _makePhoneCall('tel:$_phone');
+                  _makePhoneCall();
                 }),
               ),
             ),

@@ -85,10 +85,10 @@ Widget dropDown(
   );
 }
 
-Widget alert(BuildContext context) {
+Widget alert(BuildContext context, String title, String msg) {
   return AlertDialog(
-    title: Text('An unexpected error occured'),
-    content: Text('Somthing went error'),
+    title: Text(title),
+    content: Text(msg),
     actions: <Widget>[
       FlatButton(
         child: Text(
@@ -99,6 +99,33 @@ Widget alert(BuildContext context) {
           Navigator.of(context).pop();
         },
       )
+    ],
+  );
+}
+
+Widget deleteDialog(BuildContext context, String title, Function onpressed) {
+  return AlertDialog(
+    elevation: 10,
+    title: Text('Are you sure?'),
+    content: Text(
+      title,
+      style: TextStyle(fontSize: 18),
+    ),
+    actions: <Widget>[
+      FlatButton(
+        onPressed: onpressed,
+        child: Text(
+          'Yes',
+          style: TextStyle(fontSize: 18, color: Theme.of(context).primaryColor),
+        ),
+      ),
+      FlatButton(
+        onPressed: () => Navigator.of(context).pop(),
+        child: Text(
+          'No',
+          style: TextStyle(fontSize: 18, color: Theme.of(context).accentColor),
+        ),
+      ),
     ],
   );
 }
