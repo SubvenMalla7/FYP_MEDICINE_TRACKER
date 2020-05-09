@@ -17,9 +17,7 @@ class _UserProfileState extends State<UserProfile> {
   @override
   void didChangeDependencies() {
     Provider.of<Auth>(context).fetchUserData();
-    final user = Provider.of<Auth>(context);
-    print("hekko");
-    print(user.userData.length);
+    Provider.of<Auth>(context);
 
     super.didChangeDependencies();
   }

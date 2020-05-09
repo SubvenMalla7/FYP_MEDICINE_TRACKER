@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-import 'package:test_dasd/model/User.dart';
+import '../model/User.dart';
 import './http_exception.dart';
 
 class Auth with ChangeNotifier {
@@ -64,10 +64,8 @@ class Auth with ChangeNotifier {
         ),
       );
       final responseData = json.decode(response.body);
-      print(responseData['errors']);
 
       if (responseData['errors'] != null) {
-        print('hellodfsdf');
         throw HttpException(responseData['errors']);
       }
       token = responseData['token'];
@@ -143,9 +141,6 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> updateUserInfo(int id, User newUsers) async {
-    print(newUsers.condition);
-    print(token);
-    // final userIndex = loadedUserData.indexWhere((users) => users.id == id);
     final url = 'http://192.168.0.103:8000/api/updateUser?api_token=$token';
     await http.put(
       url,
@@ -158,14 +153,8 @@ class Auth with ChangeNotifier {
         "conditions": newUsers.condition,
       }),
     );
-    print('done');
+
     notifyListeners();
-    // if (userIndex >= 0) {
-    //   loadedUserData[userIndex] = newUsers;
-    //
-    // } else {
-    //   print('....');
-    // }
   }
 
   Future<void> deleteuser(int id) async {

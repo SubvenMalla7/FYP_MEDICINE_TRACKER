@@ -43,7 +43,7 @@ class _AddUserDetailsState extends State<AddUserDetails> {
       name: _editedData.name,
       phone: _editedData.phone,
     );
-    print(_editedData.phone);
+
     form.currentState.save();
     setState(() {
       _isLoading = true;
@@ -68,7 +68,7 @@ class _AddUserDetailsState extends State<AddUserDetails> {
     // }
 
     setState(() {
-      _isLoading = false;
+      _isLoading = true;
     });
 
     Navigator.of(context).pop();
@@ -97,188 +97,177 @@ class _AddUserDetailsState extends State<AddUserDetails> {
             margin: const EdgeInsets.all(5),
             child: Column(
               children: <Widget>[
-                Card(
-                  shape: StadiumBorder(),
-                  color: Theme.of(context).primaryColor,
-                  elevation: 10,
-                  child: Container(
-                    height: 50,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        IconButton(
-                          onPressed: () => Navigator.of(context).pop(),
-                          icon: Icon(Icons.cancel),
-                          color: Theme.of(context).errorColor,
-                        ),
-                        // SizedBox(
-                        //   width: 10,
-                        // ),
-                        Text(
-                          'Add Your Details',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        // SizedBox(
-                        //   width: 70,
-                        // ),
-                        IconButton(
-                            icon: Icon(Icons.check, color: Colors.white),
-                            onPressed: () => _save(context)),
-                      ],
-                    ),
-                  ),
-                ),
+                customAppBar(
+                    context,
+                    Icons.cancel,
+                    Theme.of(context).errorColor,
+                    'Add Your Details',
+                    Icons.check,
+                    Colors.white,
+                    () => Navigator.of(context).pop(),
+                    () => _save(context)),
                 Container(
-                    child: Form(
-                  key: form,
-                  child: Column(
-                    children: <Widget>[
-                      buildCard(
-                        child: Column(
-                          children: <Widget>[
-                            buildForm(
-                                _editedData.name,
-                                'Full Name',
-                                'Please enter your Name',
-                                TextInputType.text,
-                                (value) => {
-                                      _editedData = User(
-                                        id: _editedData.id,
-                                        age: _editedData.age,
-                                        condition: _editedData.condition,
-                                        email: _editedData.email,
-                                        gender: _editedData.gender,
-                                        name: value,
-                                        phone: _editedData.phone,
-                                      )
-                                    }),
-                            buildForm(
-                                _editedData.email,
-                                'Email',
-                                'Please enter your email',
-                                TextInputType.emailAddress,
-                                (value) => {
-                                      _editedData = User(
-                                        id: _editedData.id,
-                                        age: _editedData.age,
-                                        condition: _editedData.condition,
-                                        email: value,
-                                        gender: _editedData.gender,
-                                        name: _editedData.name,
-                                        phone: _editedData.phone,
-                                      )
-                                    }),
-                            buildForm(
-                                _editedData.phone,
-                                'Phone',
-                                'Please enter your Phone',
-                                TextInputType.phone,
-                                (value) => {
-                                      _editedData = User(
-                                        id: _editedData.id,
-                                        age: _editedData.age,
-                                        condition: _editedData.condition,
-                                        email: _editedData.email,
-                                        gender: _editedData.gender,
-                                        name: _editedData.name,
-                                        phone: value.toString(),
-                                      )
-                                    }),
-                          ],
-                        ),
-                      ),
-                      buildCard(
-                        child: Column(
-                          children: <Widget>[
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    child: _isLoading
+                        ? CircularProgressIndicator()
+                        : Form(
+                            key: form,
+                            child: Column(
                               children: <Widget>[
-                                Container(
-                                  width: 120,
-                                  child: buildForm(
-                                      _editedData.age.toString(),
-                                      'Age',
-                                      'Please enter your Age.',
-                                      TextInputType.number,
-                                      (value) => {
-                                            _editedData = User(
-                                              id: _editedData.id,
-                                              age: value,
-                                              condition: _editedData.condition,
-                                              email: _editedData.email,
-                                              gender: _editedData.gender,
-                                              name: _editedData.name,
-                                              phone: _editedData.phone,
-                                            )
-                                          }),
-                                ),
-                                Container(
-                                  width: 180,
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                buildCard(
+                                  child: Column(
                                     children: <Widget>[
-                                      Text(
-                                        'Gender:',
-                                        style: textStyle(),
-                                      ),
-                                      dropDown(
-                                        genders,
-                                        Theme.of(context).primaryColor,
-                                        _selectedGender,
-                                        (String newValue) {
-                                          setState(() {
-                                            this._selectedGender = newValue;
-                                          });
-                                        },
+                                      buildForm(
+                                          _editedData.name,
+                                          'Full Name',
+                                          'Please enter your Name',
+                                          TextInputType.text,
+                                          (value) => {
+                                                _editedData = User(
+                                                  id: _editedData.id,
+                                                  age: _editedData.age,
+                                                  condition:
+                                                      _editedData.condition,
+                                                  email: _editedData.email,
+                                                  gender: _editedData.gender,
+                                                  name: value,
+                                                  phone: _editedData.phone,
+                                                )
+                                              }),
+                                      buildForm(
+                                          _editedData.email,
+                                          'Email',
+                                          'Please enter your email',
+                                          TextInputType.emailAddress,
+                                          (value) => {
+                                                _editedData = User(
+                                                  id: _editedData.id,
+                                                  age: _editedData.age,
+                                                  condition:
+                                                      _editedData.condition,
+                                                  email: value,
+                                                  gender: _editedData.gender,
+                                                  name: _editedData.name,
+                                                  phone: _editedData.phone,
+                                                )
+                                              }),
+                                      buildForm(
+                                          _editedData.phone,
+                                          'Phone',
+                                          'Please enter your Phone',
+                                          TextInputType.phone,
+                                          (value) => {
+                                                _editedData = User(
+                                                  id: _editedData.id,
+                                                  age: _editedData.age,
+                                                  condition:
+                                                      _editedData.condition,
+                                                  email: _editedData.email,
+                                                  gender: _editedData.gender,
+                                                  name: _editedData.name,
+                                                  phone: value.toString(),
+                                                )
+                                              }),
+                                    ],
+                                  ),
+                                ),
+                                buildCard(
+                                  child: Column(
+                                    children: <Widget>[
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: <Widget>[
+                                          Container(
+                                            width: 120,
+                                            child: buildForm(
+                                                _editedData.age.toString(),
+                                                'Age',
+                                                'Please enter your Age.',
+                                                TextInputType.number,
+                                                (value) => {
+                                                      _editedData = User(
+                                                        id: _editedData.id,
+                                                        age: value,
+                                                        condition: _editedData
+                                                            .condition,
+                                                        email:
+                                                            _editedData.email,
+                                                        gender:
+                                                            _editedData.gender,
+                                                        name: _editedData.name,
+                                                        phone:
+                                                            _editedData.phone,
+                                                      )
+                                                    }),
+                                          ),
+                                          Container(
+                                            width: 180,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: <Widget>[
+                                                Text(
+                                                  'Gender:',
+                                                  style:
+                                                      textStyle(Colors.black),
+                                                ),
+                                                dropDown(
+                                                  genders,
+                                                  Theme.of(context)
+                                                      .primaryColor,
+                                                  _selectedGender,
+                                                  (String newValue) {
+                                                    setState(() {
+                                                      this._selectedGender =
+                                                          newValue;
+                                                    });
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
                                 ),
+                                buildCard(
+                                  child: Column(
+                                    children: <Widget>[
+                                      buildForm(
+                                          _editedData.condition,
+                                          'Medical Conditions (if any)',
+                                          '',
+                                          TextInputType.multiline, (value) {
+                                        _editedData = User(
+                                          id: _editedData.id,
+                                          age: _editedData.age,
+                                          condition: value,
+                                          email: _editedData.email,
+                                          gender: _editedData.gender,
+                                          name: _editedData.name,
+                                          phone: _editedData.phone,
+                                        );
+                                      })
+                                    ],
+                                  ),
+                                ),
+                                FlatButton(
+                                  color: Theme.of(context).accentColor,
+                                  shape: StadiumBorder(),
+                                  onPressed: () => _save(context),
+                                  child: Text(
+                                    'Done',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                )
                               ],
                             ),
-                          ],
-                        ),
-                      ),
-                      buildCard(
-                        child: Column(
-                          children: <Widget>[
-                            buildForm(
-                                _editedData.condition,
-                                'Medical Conditions (if any)',
-                                '',
-                                TextInputType.multiline, (value) {
-                              _editedData = User(
-                                id: _editedData.id,
-                                age: _editedData.age,
-                                condition: value,
-                                email: _editedData.email,
-                                gender: _editedData.gender,
-                                name: _editedData.name,
-                                phone: _editedData.phone,
-                              );
-                            })
-                          ],
-                        ),
-                      ),
-                      FlatButton(
-                        color: Theme.of(context).accentColor,
-                        shape: StadiumBorder(),
-                        onPressed: () => _save(context),
-                        child: Text(
-                          'Done',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ))
+                          ))
               ],
             ),
           ),

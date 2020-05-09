@@ -8,6 +8,22 @@ import '../widgets/buildCard_widget.dart';
 
 enum AuthMode { Signup, Login }
 
+class EmailValidator {
+  static String validate(String value) {
+    return value.isEmpty
+        ? 'Email cannot be empty'
+        : !value.contains('@') ? 'Email Should contain @' : null;
+  }
+}
+
+class PasswordValidator {
+  static String validate(String value) {
+    return value.isEmpty
+        ? 'Password cannot be empty'
+        : value.length < 5 ? 'Password is too short!' : null;
+  }
+}
+
 class LoginSign extends StatefulWidget {
   @override
   _LoginSignState createState() => _LoginSignState();
@@ -66,7 +82,7 @@ class _LoginSignState extends State<LoginSign>
             alert(context, 'Please Check your in input', messsage));
   }
 
-  Future<void> _submit() async {
+  Future<void> submit() async {
     if (!_formKey.currentState.validate()) {
       // Invalid!
       return;
@@ -91,8 +107,6 @@ class _LoginSignState extends State<LoginSign>
         );
       }
     } on HttpException catch (error) {
-      print(error.message);
-      //print(error);
       var errorMessage = 'Authantication Failed';
       if (error.toString().contains('The email has already been taken.')) {
         errorMessage = 'The email has already been taken.';
@@ -128,9 +142,11 @@ class _LoginSignState extends State<LoginSign>
 
   @override
   Widget build(BuildContext context) {
+    final _screenSize = MediaQuery.of(context).size;
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Container(
+        height: _screenSize.height,
         decoration: BoxDecoration(
             image: DecorationImage(
           image: AssetImage("assets/image/Medicine.png"),
@@ -143,7 +159,7 @@ class _LoginSignState extends State<LoginSign>
               Column(
                 children: <Widget>[
                   SizedBox(
-                    height: 150,
+                    height: _screenSize.height * 0.19,
                   ),
                   Column(
                     children: <Widget>[
@@ -176,7 +192,7 @@ class _LoginSignState extends State<LoginSign>
                     ],
                   ),
                   SizedBox(
-                    height: 30,
+                    height: _screenSize.height * 0.03,
                   ),
                   Container(
                     child: authCard(context),
@@ -216,30 +232,24 @@ class _LoginSignState extends State<LoginSign>
                 child: Column(
                   children: <Widget>[
                     TextFormField(
+                      key: Key('email'),
                       decoration: InputDecoration(
                           labelText: 'E-Mail', icon: Icon(Icons.email)),
                       keyboardType: TextInputType.emailAddress,
-                      validator: (value) {
-                        if (value.isEmpty || !value.contains('@')) {
-                          return 'Invalid email!';
-                        }
-                      },
+                      validator: EmailValidator.validate,
                       onSaved: (value) {
                         _authData['email'] = value;
                       },
                     ),
                     TextFormField(
+                      key: Key('password'),
                       decoration: InputDecoration(
                         labelText: 'Password',
                         icon: Icon(Icons.lock),
                       ),
                       obscureText: true,
                       controller: _passwordController,
-                      validator: (value) {
-                        if (value.isEmpty || value.length < 5) {
-                          return 'Password is too short!';
-                        }
-                      },
+                      validator: PasswordValidator.validate,
                       onSaved: (value) {
                         _authData['password'] = value;
                       },
@@ -253,9 +263,9 @@ class _LoginSignState extends State<LoginSign>
                         obscureText: true,
                         validator: _authMode == AuthMode.Signup
                             ? (value) {
-                                if (value != _passwordController.text) {
-                                  return 'Passwords do not match!';
-                                }
+                                return value != _passwordController.text
+                                    ? 'Passwords do not match!'
+                                    : null;
                               }
                             : null,
                       ),
@@ -266,7 +276,7 @@ class _LoginSignState extends State<LoginSign>
           ),
         ),
         SizedBox(
-          height: 20,
+          height: deviceSize.height * 0.03,
         ),
         if (_isLoading)
           CircularProgressIndicator()
@@ -274,11 +284,12 @@ class _LoginSignState extends State<LoginSign>
           Padding(
             padding: const EdgeInsets.only(left: 150.0),
             child: RaisedButton(
+              key: _authMode == AuthMode.Login ? Key('login') : Key('signin'),
               elevation: 8,
               child: Container(
                 alignment: Alignment.center,
-                height: 40,
-                width: 90,
+                height: deviceSize.height * 0.05,
+                width: deviceSize.width * 0.2,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
@@ -293,7 +304,7 @@ class _LoginSignState extends State<LoginSign>
                   ],
                 ),
               ),
-              onPressed: _submit,
+              onPressed: submit,
               shape: StadiumBorder(),
               padding: EdgeInsets.symmetric(horizontal: 40.0, vertical: 8.0),
               color: Colors.orange.withOpacity(0.7),
@@ -301,7 +312,7 @@ class _LoginSignState extends State<LoginSign>
             ),
           ),
         SizedBox(
-          height: _authMode == AuthMode.Signup ? 55 : 80,
+          height: _authMode == AuthMode.Signup ? deviceSize.height * 0.15 : 50,
         ),
         _authMode == AuthMode.Login
             ? InkWell(
@@ -318,7 +329,7 @@ class _LoginSignState extends State<LoginSign>
                 onTap: _launchURL,
               )
             : SizedBox(
-                height: 0,
+                height: deviceSize.height * 0,
               ),
         FlatButton(
           child: Text(

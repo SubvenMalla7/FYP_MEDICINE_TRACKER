@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 
-TextStyle textStyle() {
-  return TextStyle(
-      color: Colors.black54, fontSize: 18, fontWeight: FontWeight.bold);
+TextStyle textStyle(Color color) {
+  return TextStyle(color: color, fontSize: 18, fontWeight: FontWeight.bold);
 }
 
 TextStyle headingStyle(BuildContext context) {
@@ -20,7 +19,7 @@ Widget myRadioButton(
     onChanged: onChanged,
     title: Text(
       title,
-      style: textStyle(),
+      style: textStyle(Colors.white),
     ),
   );
 }
@@ -56,7 +55,8 @@ Widget buildForm(String initailValue, String label, String msg,
         : TextInputAction.next,
     maxLines: label == 'Medical Conditions (if any)' ? 3 : 1,
     keyboardType: textInputType,
-    validator: label == 'Medical Conditions (if any)'
+    validator: label == 'Medical Conditions (if any)' ||
+            label == 'Any other instructions?'
         ? null
         : (value) {
             if (value.isEmpty) {
@@ -127,5 +127,80 @@ Widget deleteDialog(BuildContext context, String title, Function onpressed) {
         ),
       ),
     ],
+  );
+}
+
+Widget customAppBar(
+    BuildContext context,
+    IconData icon1,
+    Color color1,
+    String title,
+    IconData icon2,
+    Color color2,
+    Function onPressed,
+    Function onPressed2) {
+  return Card(
+    shape: StadiumBorder(),
+    color: Theme.of(context).primaryColor,
+    elevation: 10,
+    child: Container(
+      height: 50,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          IconButton(
+            onPressed: onPressed,
+            icon: Icon(icon1),
+            color: color1,
+          ),
+          // SizedBox(
+          //   width: 10,
+          // ),
+          Text(
+            title,
+            style: TextStyle(
+                color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          // SizedBox(
+          //   width: 70,
+          // ),
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: IconButton(
+                icon: Icon(icon2, color: color2), onPressed: onPressed2),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget myRadioButton1(
+    {var groupValue, String title, int value, Function onChanged}) {
+  return RadioListTile(
+    value: value,
+    groupValue: groupValue,
+    onChanged: onChanged,
+    title: Text(
+      title,
+      style: textStyle(Colors.black54),
+    ),
+  );
+}
+
+Widget myRadioButton2(
+    {var groupValue,
+    String title,
+    int value,
+    Function onChanged,
+    Function onChange}) {
+  return RadioListTile(
+    value: value,
+    groupValue: groupValue,
+    onChanged: onChange,
+    title: Text(
+      title,
+      style: textStyle(Colors.black54),
+    ),
   );
 }

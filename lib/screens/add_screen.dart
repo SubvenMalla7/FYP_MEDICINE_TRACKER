@@ -3,7 +3,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:intl/intl.dart';
 
-import 'package:test_dasd/screens/tab_screen.dart';
+import '../screens/tab_screen.dart';
 import '../my_icons_icons.dart';
 import 'package:provider/provider.dart';
 import '../model/Medicine.dart';
@@ -21,7 +21,7 @@ class _AddScreenState extends State<AddScreen> {
   //variables
 
   final _form = GlobalKey<FormState>();
-  int _groupValue = 4;
+  int _groupValue = 1;
   static DateTime dateTime = DateTime.now();
   String date = DateFormat("yyyy-MM-dd").format(dateTime);
   var _editedMedicine = Medicine(
@@ -38,29 +38,48 @@ class _AddScreenState extends State<AddScreen> {
     note: '',
     type: '',
   );
-  String _freqencyItemSelected = 'Once a day';
+
   String _instruction = "Doesn't matter";
   TimeOfDay _time = TimeOfDay.now();
   double dose = 0;
   String selectedUnit = 'tablet(s)';
   int days;
   String daysTitle = 'Number of days';
-  static List<IconData> icons = [
-    MyIcons.color_pill,
-    MyIcons.drugs,
-    MyIcons.circle,
-    MyIcons.oval,
-    MyIcons.water,
-    MyIcons.pill_vertical,
-    MyIcons.vaccine,
-    MyIcons.inhaler,
-    MyIcons.eye_dropper,
-    MyIcons.spray,
-    MyIcons.spoon,
-    MyIcons.medicine_bottle,
+  // static List<IconData> icons = [
+  //   MyIcons.color_pill,
+  //   MyIcons.drugs,
+  //   MyIcons.circle,
+  //   MyIcons.oval,
+  //   MyIcons.water,
+  //   MyIcons.pill_vertical,
+  //   MyIcons.vaccine,
+  //   MyIcons.inhaler,
+  //   MyIcons.eye_dropper,
+  //   MyIcons.spray,
+  //   MyIcons.spoon,
+  //   MyIcons.medicine_bottle,
 
-    // all the icons you want to include
-  ];
+  //   // all the icons you want to include
+  // ];
+  Function onpressed(String title) {
+    return (newValue) => setState(() => {
+          _groupValue = newValue,
+          _instruction = title,
+          _editedMedicine = Medicine(
+              id: _editedMedicine.id,
+              title: _editedMedicine.title,
+              amount: _editedMedicine.amount,
+              time: _editedMedicine.time,
+              icon: _editedMedicine.icon,
+              color: _editedMedicine.color,
+              date: _editedMedicine.date,
+              instruction: _instruction,
+              note: _editedMedicine.note,
+              type: _editedMedicine.type),
+        });
+  }
+
+  var _selected = 0;
 
   static var _icon = MyIcons.color_pill;
   Color _iconColor = Colors.white70;
@@ -73,29 +92,18 @@ class _AddScreenState extends State<AddScreen> {
     Colors.green,
     Colors.black,
   ];
-  Icon icon;
-  //Color _iconColor = Colors.red;
+  var _intervals = [
+    6,
+    8,
+    12,
+    24,
+  ];
   var time;
   var inIt = true;
   List<bool> isSelected;
   var _isLoading = false;
   FlutterLocalNotificationsPlugin localNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
-  //
-
-  Widget _myRadioButton({String title, int value, Function onChanged}) {
-    return RadioListTile(
-      value: value,
-      groupValue: _groupValue,
-      onChanged: onChanged,
-      title: Text(
-        title,
-        style: textStyle(),
-      ),
-    );
-  }
-
-  var _frequecies = ['Once a day', 'Twice a day', '3 times a day'];
 
   var _unit = [
     'tablet(s)',
@@ -138,12 +146,22 @@ class _AddScreenState extends State<AddScreen> {
     }
   }
 
+  Widget icon(IconData icon) {
+    return IconButton(
+      onPressed: () {
+        _icon = icon;
+      },
+      icon: Icon(icon, color: _iconColor),
+    );
+  }
+
   Future<void> _save(BuildContext context) async {
+    print(_editedMedicine.instruction);
     final isValid = _form.currentState.validate();
     if (!isValid) {
       return;
     }
-    // print('this is ${_icon.codePoint}');
+
     _editedMedicine = Medicine(
       id: _editedMedicine.id,
       title: _editedMedicine.title,
@@ -154,15 +172,14 @@ class _AddScreenState extends State<AddScreen> {
         color: _iconColor,
       ),
       color: _iconColor.value,
-      instruction: _editedMedicine.instruction,
+      instruction: _editedMedicine.instruction.isNotEmpty
+          ? _editedMedicine.instruction
+          : "Doesn't matter",
       date: date,
-      note: _editedMedicine.note,
+      note: _editedMedicine.note == '' ? "-" : _editedMedicine.note,
       type: selectedUnit,
     );
 
-    // print(_editedMedicine.color);
-    // print(icon);
-    // _icon = MyIcons.color_pill;
     _form.currentState.save();
     setState(() {
       _isLoading = true;
@@ -181,12 +198,6 @@ class _AddScreenState extends State<AddScreen> {
               alert(context, 'An Error Occurred', 'Please try again!'),
         );
       }
-      // finally {
-      //   setState(() {
-      //     _isLoading = false;
-      //   });
-      //   Navigator.of(context).pop();
-      // }
     }
     setState(() {
       _isLoading = false;
@@ -195,7 +206,7 @@ class _AddScreenState extends State<AddScreen> {
     Navigator.of(context).pushNamed(TabsScreen.routeName);
   }
 
-  Future<Null> _selectDose(BuildContext context) async {
+  Future<Null> _selectDose(BuildContext context, int id) async {
     TextEditingController customController = TextEditingController();
     final _customNode = FocusNode();
 
@@ -206,7 +217,11 @@ class _AddScreenState extends State<AddScreen> {
       }
       if (customController.text != null) {
         setState(() {
-          dose = double.parse(customController.text);
+          id == 1
+              ? dose = double.parse(customController.text)
+              : days = int.parse(customController.text);
+
+          daysTitle = 'Number of days: $days day(s)';
         });
       }
       Navigator.of(context).pop();
@@ -215,7 +230,7 @@ class _AddScreenState extends State<AddScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Add you dose!'),
+        title: Text(id == 1 ? 'Add you dose!' : 'Number Of Days'),
         content: TextField(
           controller: customController,
           focusNode: _customNode,
@@ -268,53 +283,6 @@ class _AddScreenState extends State<AddScreen> {
     });
   }
 
-  Future<Null> _selectDays(BuildContext context) async {
-    TextEditingController customController = TextEditingController();
-    final _customNode = FocusNode();
-
-    void tap(BuildContext context) {
-      if (customController.text == '') {
-        Navigator.of(context).pop();
-        return;
-      }
-      if (customController.text != null) {
-        setState(() {
-          days = int.parse(customController.text);
-
-          daysTitle = 'Number of days: $days day(s)';
-        });
-      }
-      Navigator.of(context).pop();
-    }
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Add you dose!'),
-        content: TextField(
-          controller: customController,
-          focusNode: _customNode,
-          keyboardType: TextInputType.number,
-          textInputAction: TextInputAction.done,
-          onSubmitted: (_) => tap(context),
-        ),
-        actions: <Widget>[
-          FlatButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(
-              'Cancel',
-              style: TextStyle(color: Theme.of(context).errorColor),
-            ),
-          ),
-          FlatButton(
-            onPressed: () => tap(context),
-            child: Text('Done'),
-          ),
-        ],
-      ),
-    );
-  }
-
   void _changeIconColor(Color selectedColor) {
     setState(() {
       _iconColor = selectedColor;
@@ -338,7 +306,7 @@ class _AddScreenState extends State<AddScreen> {
       false,
       false,
     ];
-    initializeNotification();
+    initializeNotifications();
   }
 
   @override
@@ -354,718 +322,688 @@ class _AddScreenState extends State<AddScreen> {
     super.didChangeDependencies();
   }
 
-  initializeNotification() async {
-    var initiallizeAndroid = AndroidInitializationSettings('ic_launcher');
-    var initiallizeIOS = IOSInitializationSettings();
-    var initSettings =
-        InitializationSettings(initiallizeAndroid, initiallizeIOS);
-    await localNotificationsPlugin.initialize(initSettings);
-  }
-
   @override
   Widget build(BuildContext context) {
     Color color = Theme.of(context).primaryColor;
+    final screenSize = MediaQuery.of(context).size;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Add Your Meds',
-            style:
-                TextStyle(fontWeight: FontWeight.w600, color: Colors.white70)),
-        actions: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(right: 15.0),
-            child: IconButton(
-                icon: Icon(Icons.check),
-                onPressed: () async {
-                  _save(context);
-                  notification();
-                }),
-          )
-        ],
-      ),
-      body: _isLoading
-          ? Center(
-              child: CircularProgressIndicator(),
-            )
-          : SingleChildScrollView(
-              child: Container(
-                color: Theme.of(context).backgroundColor,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: <Widget>[
-                    Form(
-                      key: _form,
-                      child: Column(
-                        children: <Widget>[
-                          buildCard(
-                            child: TextFormField(
-                              initialValue: _editedMedicine.title,
-                              decoration:
-                                  InputDecoration(labelText: 'Medicine'),
-                              textInputAction: TextInputAction.next,
-                              validator: (value) {
-                                if (value.isEmpty) {
-                                  return 'Please enter the name of medicine';
-                                }
-                                return null;
-                              },
-                              onSaved: (value) {
-                                _editedMedicine = Medicine(
-                                    id: _editedMedicine.id,
-                                    title: value,
-                                    amount: _editedMedicine.amount,
-                                    time: _editedMedicine.time,
-                                    icon: _editedMedicine.icon,
-                                    color: _editedMedicine.color,
-                                    date: _editedMedicine.date,
-                                    instruction: _editedMedicine.instruction,
-                                    note: _editedMedicine.note,
-                                    type: _editedMedicine.type);
-                              },
-                            ),
-                          ),
-                          //Instructions
-                          buildCard(
-                            child: Column(
-                              children: <Widget>[
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 15),
-                                  child: Text(
-                                    'Instructions',
-                                    style: headingStyle(context),
-                                  ),
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.only(top: 2.0),
+        child: Scaffold(
+          appBar: AppBar(
+            centerTitle: true,
+            shape: StadiumBorder(),
+            title: Text(
+              'Add Your Meds',
+              style: textStyle(Colors.white),
+            ),
+            actions: <Widget>[
+              Padding(
+                padding: const EdgeInsets.only(right: 15.0),
+                child: IconButton(
+                    icon: Icon(
+                      Icons.check,
+                      color: Colors.white,
+                    ),
+                    onPressed: () async {
+                      _save(context);
+                      notification();
+                    }),
+              )
+            ],
+          ),
+          body: _isLoading
+              ? Center(
+                  child: CircularProgressIndicator(),
+                )
+              : SingleChildScrollView(
+                  child: Container(
+                    color: Theme.of(context).backgroundColor,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: <Widget>[
+                        Form(
+                          key: _form,
+                          child: Column(
+                            children: <Widget>[
+                              buildCard(
+                                child: TextFormField(
+                                  initialValue: _editedMedicine.title,
+                                  decoration:
+                                      InputDecoration(labelText: 'Medicine'),
+                                  textInputAction: TextInputAction.next,
+                                  validator: (value) {
+                                    if (value.isEmpty) {
+                                      return 'Please enter the name of medicine';
+                                    }
+                                    return null;
+                                  },
+                                  onSaved: (value) {
+                                    _editedMedicine = Medicine(
+                                      id: _editedMedicine.id,
+                                      title: value,
+                                      amount: _editedMedicine.amount,
+                                      time: _editedMedicine.time,
+                                      icon: _editedMedicine.icon,
+                                      color: _editedMedicine.color,
+                                      date: _editedMedicine.date,
+                                      instruction: _editedMedicine.instruction,
+                                      note: _editedMedicine.note,
+                                      type: _editedMedicine.type,
+                                    );
+                                  },
                                 ),
-                                Divider(
-                                  color: Colors.grey,
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.all(10),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      Text(
-                                        'Should this be taken with food?',
-                                        style: textStyle(),
+                              ),
+                              //Instructions
+                              buildCard(
+                                child: Column(
+                                  children: <Widget>[
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 15),
+                                      child: Text(
+                                        'Instructions',
+                                        style: headingStyle(context),
                                       ),
-                                      Column(
-                                        children: <Widget>[
-                                          _myRadioButton(
-                                            title: "Before eating",
-                                            value: 1,
-                                            onChanged: (newValue) =>
-                                                setState(() => {
-                                                      _groupValue = newValue,
-                                                      _instruction =
-                                                          "Before eating",
-                                                      _editedMedicine = Medicine(
-                                                          id: _editedMedicine
-                                                              .id,
-                                                          title: _editedMedicine
-                                                              .title,
-                                                          amount:
-                                                              _editedMedicine
-                                                                  .amount,
-                                                          time: _editedMedicine
-                                                              .time,
-                                                          icon: _editedMedicine
-                                                              .icon,
-                                                          color: _editedMedicine
-                                                              .color,
-                                                          date: _editedMedicine
-                                                              .date,
-                                                          instruction:
-                                                              _instruction,
-                                                          note: _editedMedicine
-                                                              .note,
-                                                          type: _editedMedicine
-                                                              .type),
-                                                    }),
-                                          ),
-                                          _myRadioButton(
-                                            title: "While eating",
-                                            value: 2,
-                                            onChanged: (newValue) =>
-                                                setState(() => {
-                                                      _groupValue = newValue,
-                                                      _instruction =
-                                                          "While eating",
-                                                      _editedMedicine = Medicine(
-                                                          id: _editedMedicine
-                                                              .id,
-                                                          title: _editedMedicine
-                                                              .title,
-                                                          amount:
-                                                              _editedMedicine
-                                                                  .amount,
-                                                          time: _editedMedicine
-                                                              .time,
-                                                          icon: _editedMedicine
-                                                              .icon,
-                                                          color: _editedMedicine
-                                                              .color,
-                                                          date: _editedMedicine
-                                                              .date,
-                                                          instruction:
-                                                              _instruction,
-                                                          note: _editedMedicine
-                                                              .note,
-                                                          type: _editedMedicine
-                                                              .type),
-                                                    }),
-                                          ),
-                                          _myRadioButton(
-                                            title: "After eating",
-                                            value: 3,
-                                            onChanged: (newValue) =>
-                                                setState(() => {
-                                                      _groupValue = newValue,
-                                                      _instruction =
-                                                          "After eating",
-                                                      _editedMedicine = Medicine(
-                                                          id: _editedMedicine
-                                                              .id,
-                                                          title: _editedMedicine
-                                                              .title,
-                                                          amount:
-                                                              _editedMedicine
-                                                                  .amount,
-                                                          time: _editedMedicine
-                                                              .time,
-                                                          icon: _editedMedicine
-                                                              .icon,
-                                                          color: _editedMedicine
-                                                              .color,
-                                                          date: _editedMedicine
-                                                              .date,
-                                                          instruction:
-                                                              _instruction,
-                                                          note: _editedMedicine
-                                                              .note,
-                                                          type: _editedMedicine
-                                                              .type),
-                                                    }),
-                                          ),
-                                          _myRadioButton(
-                                            title: "Doesn't matter",
-                                            value: 4,
-                                            onChanged: (newValue) =>
-                                                setState(() => {
-                                                      _groupValue = newValue,
-                                                      _instruction =
-                                                          "Doesn't matter",
-                                                      _editedMedicine = Medicine(
-                                                          id: _editedMedicine
-                                                              .id,
-                                                          title: _editedMedicine
-                                                              .title,
-                                                          amount:
-                                                              _editedMedicine
-                                                                  .amount,
-                                                          time: _editedMedicine
-                                                              .time,
-                                                          icon: _editedMedicine
-                                                              .icon,
-                                                          color: _editedMedicine
-                                                              .color,
-                                                          date: _editedMedicine
-                                                              .date,
-                                                          instruction:
-                                                              _instruction,
-                                                          note: _editedMedicine
-                                                              .note,
-                                                          type: _editedMedicine
-                                                              .type),
-                                                    }),
-                                          ),
-                                        ],
-                                      ),
-                                      Divider(),
-                                      TextFormField(
-                                        decoration: InputDecoration(
-                                            labelText:
-                                                'Any other instructions?'),
-                                        keyboardType: TextInputType.multiline,
-                                        maxLines: 3,
-                                        onSaved: (value) {
-                                          _editedMedicine = Medicine(
-                                              id: _editedMedicine.id,
-                                              title: _editedMedicine.title,
-                                              amount: _editedMedicine.amount,
-                                              time: _editedMedicine.time,
-                                              icon: _editedMedicine.icon,
-                                              color: _editedMedicine.color,
-                                              date: _editedMedicine.date,
-                                              instruction:
-                                                  _editedMedicine.instruction,
-                                              note: value,
-                                              type: _editedMedicine.type);
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          //Reminder Times
-                          buildCard(
-                              child: Container(
-                            width: double.infinity,
-                            child: Column(
-                              children: <Widget>[
-                                Text(
-                                  'Reminder Times',
-                                  style: headingStyle(context),
-                                ),
-                                Divider(
-                                  color: Colors.grey,
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.all(15),
-                                  child: Column(
-                                    children: <Widget>[
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                    ),
+                                    Divider(
+                                      color: Colors.grey,
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.all(10),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: <Widget>[
                                           Text(
-                                            'Frequency:',
-                                            style: textStyle(),
+                                            'Should this be taken with food?',
+                                            style: textStyle(Colors.black54),
                                           ),
-                                          Container(
-                                            child: dropDown(
-                                              _frequecies,
-                                              color,
-                                              _freqencyItemSelected,
-                                              (String newValue) {
-                                                setState(() {
-                                                  this._freqencyItemSelected =
-                                                      newValue;
-                                                });
-                                              },
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Divider(),
-                                GestureDetector(
-                                  onTap: () => _selectTime(context),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 10.0, horizontal: 15),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: <Widget>[
-                                        Text(
-                                          'Time:',
-                                          style: textStyle(),
-                                        ),
-                                        Text(
-                                          _editedMedicine.id != null
-                                              ? _editedMedicine.time
-                                              : '${_time.format(context)}',
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            color: color,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                Divider(),
-                                Container(
-                                  //padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                                  child: GestureDetector(
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: <Widget>[
-                                        Text(
-                                          'Dose:',
-                                          style: textStyle(),
-                                        ),
-                                        Container(
-                                          child: Row(
+                                          Column(
                                             children: <Widget>[
-                                              IconButton(
-                                                icon: Icon(
-                                                  MdiIcons.minus,
-                                                ),
-                                                onPressed: () {
-                                                  if (dose > 0 ||
-                                                      _editedMedicine.amount >
-                                                          0) {
-                                                    setState(() {
-                                                      _editedMedicine.id != null
-                                                          ? _editedMedicine
-                                                              .amount -= 0.25
-                                                          : dose -= 0.25;
-                                                    });
-                                                  }
-                                                },
+                                              myRadioButton2(
+                                                groupValue: _groupValue,
+                                                onChange:
+                                                    onpressed("Before eating"),
+                                                title: "Before eating",
+                                                value: 1,
                                               ),
-                                              GestureDetector(
-                                                onTap: () {
-                                                  _selectDose(context);
-                                                },
-                                                child: Container(
-                                                  width: 60,
-                                                  height: 30,
-                                                  decoration: BoxDecoration(
-                                                    border: Border(
-                                                        bottom: BorderSide(
-                                                            color:
-                                                                Colors.black54,
-                                                            width: 3)),
-                                                  ),
-                                                  child: Text(
-                                                    _editedMedicine.id != null
-                                                        ? _editedMedicine.amount
-                                                            .toString()
-                                                        : dose.toString(),
-                                                    style: TextStyle(
-                                                        color: color,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 18),
-                                                    textAlign: TextAlign.center,
-                                                  ),
-                                                ),
+                                              myRadioButton2(
+                                                groupValue: _groupValue,
+                                                title: "While eating",
+                                                onChange:
+                                                    onpressed("While eating"),
+                                                value: 2,
                                               ),
-                                              IconButton(
-                                                icon: Icon(
-                                                  Icons.add,
-                                                ),
-                                                onPressed: () {
-                                                  setState(() {
-                                                    _editedMedicine.id != null
-                                                        ? _editedMedicine
-                                                            .amount += 0.25
-                                                        : dose += 0.25;
-                                                  });
-                                                },
+                                              myRadioButton2(
+                                                groupValue: _groupValue,
+                                                title: "After eating",
+                                                onChange:
+                                                    onpressed("After eating"),
+                                                value: 3,
                                               ),
-                                              Container(
-                                                child: dropDown(
-                                                    _unit, color, selectedUnit,
-                                                    (String newValue) {
-                                                  setState(() {
-                                                    this.selectedUnit =
-                                                        newValue;
-                                                  });
-                                                }),
+                                              myRadioButton2(
+                                                groupValue: _groupValue,
+                                                title: "Doesn't matter",
+                                                onChange:
+                                                    onpressed("Doesn't matter"),
+                                                value: 4,
                                               ),
                                             ],
                                           ),
+                                          Divider(),
+                                          buildForm(
+                                            '-',
+                                            'Any other instructions?',
+                                            '',
+                                            TextInputType.multiline,
+                                            (value) {
+                                              _editedMedicine = Medicine(
+                                                  id: _editedMedicine.id,
+                                                  title: _editedMedicine.title,
+                                                  amount:
+                                                      _editedMedicine.amount,
+                                                  time: _editedMedicine.time,
+                                                  icon: _editedMedicine.icon,
+                                                  color: _editedMedicine.color,
+                                                  date: _editedMedicine.date,
+                                                  instruction: _editedMedicine
+                                                      .instruction,
+                                                  note: value,
+                                                  type: _editedMedicine.type);
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              //Reminder Times
+                              buildCard(
+                                  child: Container(
+                                width: double.infinity,
+                                child: Column(
+                                  children: <Widget>[
+                                    Text(
+                                      'Reminder Times',
+                                      style: headingStyle(context),
+                                    ),
+                                    Divider(
+                                      color: Colors.grey,
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.all(15),
+                                      child: Column(
+                                        children: <Widget>[
+                                          Row(
+                                            children: <Widget>[
+                                              Text("Remind me every",
+                                                  style: textStyle(
+                                                      Colors.black54)),
+                                              SizedBox(
+                                                width: screenSize.width * 0.1,
+                                              ),
+                                              DropdownButton<int>(
+                                                hint: _selected == 0
+                                                    ? Text(
+                                                        "Interval",
+                                                        style: textStyle(color),
+                                                      )
+                                                    : null,
+                                                elevation: 4,
+                                                value: _selected == 0
+                                                    ? null
+                                                    : _selected,
+                                                items:
+                                                    _intervals.map((int value) {
+                                                  return DropdownMenuItem<int>(
+                                                    value: value,
+                                                    child: Text(
+                                                      value.toString(),
+                                                      style: textStyle(color),
+                                                    ),
+                                                  );
+                                                }).toList(),
+                                                onChanged: (newVal) {
+                                                  setState(() {
+                                                    _selected = newVal;
+                                                  });
+                                                },
+                                              ),
+                                              Text(
+                                                _selected == 1
+                                                    ? " hour"
+                                                    : " hours",
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          // Row(
+                                          //   mainAxisAlignment:
+                                          //       MainAxisAlignment.spaceBetween,
+                                          //   children: <Widget>[
+                                          //     Text(
+                                          //       'Frequency:',
+                                          //       style:
+                                          //           textStyle(Colors.black54),
+                                          //     ),
+                                          //     Container(
+                                          //       child: dropDown(
+                                          //         _frequecies,
+                                          //         color,
+                                          //         _freqencyItemSelected,
+                                          //         (String newValue) {
+                                          //           setState(() {
+                                          //             this._freqencyItemSelected =
+                                          //                 newValue;
+                                          //           });
+                                          //         },
+                                          //       ),
+                                          //     )
+                                          //   ],
+                                          // ),
+                                        ],
+                                      ),
+                                    ),
+                                    Column(
+                                      children: <Widget>[
+                                        GestureDetector(
+                                          onTap: () => _selectTime(context),
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 10.0, horizontal: 15),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: <Widget>[
+                                                Text(
+                                                  'Time:',
+                                                  style:
+                                                      textStyle(Colors.black54),
+                                                ),
+                                                SizedBox(
+                                                  width:
+                                                      screenSize.width * 0.45,
+                                                ),
+                                                Text(
+                                                  _editedMedicine.id != null
+                                                      ? _editedMedicine.time
+                                                      : '${_time.format(context)}',
+                                                  style: textStyle(color),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
                                         ),
                                       ],
                                     ),
-                                  ),
-                                )
-                              ],
-                            ),
-                          )),
-                          //schedule
-                          buildCard(
-                            child: Column(
-                              children: <Widget>[
-                                Text(
-                                  'Schedule',
-                                  style: headingStyle(context),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.all(18),
-                                  child: Column(
-                                    children: <Widget>[
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: <Widget>[
-                                          Text(
-                                            'Start Date:',
-                                            style: textStyle(),
-                                          ),
-                                          InkWell(
-                                            onTap: () {
-                                              _selectdate(context);
-                                            },
-                                            child: Text(
-                                              date,
-                                              style: TextStyle(
-                                                color: Theme.of(context)
-                                                    .primaryColor,
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w700,
+                                    Divider(),
+                                    Container(
+                                      //padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                                      child: GestureDetector(
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: <Widget>[
+                                            Text(
+                                              'Dose:',
+                                              style: textStyle(Colors.black54),
+                                            ),
+                                            Container(
+                                              child: Row(
+                                                children: <Widget>[
+                                                  IconButton(
+                                                    icon: Icon(
+                                                      MdiIcons.minus,
+                                                    ),
+                                                    onPressed: () {
+                                                      if (dose > 0 ||
+                                                          _editedMedicine
+                                                                  .amount >
+                                                              0) {
+                                                        setState(() {
+                                                          _editedMedicine.id !=
+                                                                  null
+                                                              ? _editedMedicine
+                                                                      .amount -=
+                                                                  0.25
+                                                              : dose -= 0.25;
+                                                        });
+                                                      }
+                                                    },
+                                                  ),
+                                                  GestureDetector(
+                                                    onTap: () {
+                                                      _selectDose(context, 1);
+                                                    },
+                                                    child: Container(
+                                                      width: screenSize.width *
+                                                          0.09,
+                                                      height:
+                                                          screenSize.height *
+                                                              0.04,
+                                                      decoration: BoxDecoration(
+                                                        border: Border(
+                                                          bottom: BorderSide(
+                                                              color: Colors
+                                                                  .black54,
+                                                              width: 3),
+                                                        ),
+                                                      ),
+                                                      child: Text(
+                                                        _editedMedicine.id !=
+                                                                null
+                                                            ? _editedMedicine
+                                                                .amount
+                                                                .toString()
+                                                            : dose.toString(),
+                                                        style: TextStyle(
+                                                            color: color,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 18),
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  IconButton(
+                                                    icon: Icon(
+                                                      Icons.add,
+                                                    ),
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        _editedMedicine.id !=
+                                                                null
+                                                            ? _editedMedicine
+                                                                .amount += 0.25
+                                                            : dose += 0.25;
+                                                      });
+                                                    },
+                                                  ),
+                                                  Container(
+                                                    child: dropDown(_unit,
+                                                        color, selectedUnit,
+                                                        (String newValue) {
+                                                      setState(() {
+                                                        this.selectedUnit =
+                                                            newValue;
+                                                      });
+                                                    }),
+                                                  ),
+                                                ],
                                               ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              )),
+                              //schedule
+                              buildCard(
+                                child: Column(
+                                  children: <Widget>[
+                                    Text(
+                                      'Schedule',
+                                      style: headingStyle(context),
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.all(18),
+                                      child: Column(
+                                        children: <Widget>[
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: <Widget>[
+                                              Text(
+                                                'Start Date:',
+                                                style:
+                                                    textStyle(Colors.black54),
+                                              ),
+                                              InkWell(
+                                                onTap: () {
+                                                  _selectdate(context);
+                                                },
+                                                child: Text(
+                                                  date,
+                                                  style: TextStyle(
+                                                    color: Theme.of(context)
+                                                        .primaryColor,
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.w700,
+                                                  ),
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                          Divider(
+                                            color: Colors.grey,
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 8.0),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: <Widget>[
+                                                Text(
+                                                  'Duration',
+                                                  style:
+                                                      textStyle(Colors.black54),
+                                                ),
+                                                Column(
+                                                  children: <Widget>[
+                                                    myRadioButton1(
+                                                      title: "Every Day",
+                                                      value: 1,
+                                                      groupValue: _groupValue,
+                                                      onChanged: (newValue) =>
+                                                          setState(() =>
+                                                              _groupValue =
+                                                                  newValue),
+                                                    ),
+                                                    InkWell(
+                                                      onTap: () => _selectDose(
+                                                          context, 2),
+                                                      child: myRadioButton1(
+                                                        title: daysTitle,
+                                                        value: 2,
+                                                        groupValue: _groupValue,
+                                                        onChanged: (newValue) {
+                                                          _selectDose(
+                                                              context, 2);
+                                                          setState(() {
+                                                            _groupValue =
+                                                                newValue;
+                                                          });
+                                                        },
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
                                             ),
                                           )
                                         ],
                                       ),
-                                      Divider(
-                                        color: Colors.grey,
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 8.0),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Text(
-                                              'Duration',
-                                              style: textStyle(),
-                                            ),
-                                            Column(
-                                              children: <Widget>[
-                                                _myRadioButton(
-                                                  title: "Every Day",
-                                                  value: 1,
-                                                  onChanged: (newValue) =>
-                                                      setState(() =>
-                                                          _groupValue =
-                                                              newValue),
-                                                ),
-                                                InkWell(
-                                                  onTap: () =>
-                                                      _selectDays(context),
-                                                  child: _myRadioButton(
-                                                    title: daysTitle,
-                                                    value: 2,
-                                                    onChanged: (newValue) {
-                                                      setState(() {
-                                                        _groupValue = newValue;
-                                                        _selectDays(context);
-                                                      });
-                                                    },
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                          //Med icon
-                          buildCard(
-                              child: Column(
-                            children: <Widget>[
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 15.0),
-                                child: Text(
-                                  'Medicine Icon',
-                                  style: headingStyle(context),
+                                    )
+                                  ],
                                 ),
                               ),
-                              Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(13),
-                                    color: Colors.black38,
-                                  ),
-                                  padding: const EdgeInsets.all(15),
+                              //Med icon
+                              buildCard(
                                   child: Column(
-                                    children: <Widget>[
-                                      SingleChildScrollView(
-                                        scrollDirection: Axis.horizontal,
-                                        child: Row(
-                                          children: <Widget>[
-                                            IconButton(
-                                              onPressed: () {
-                                                _icon = MyIcons.color_pill;
-                                              },
-                                              icon: Icon(MyIcons.color_pill,
-                                                  color: _iconColor),
-                                            ),
-                                            IconButton(
-                                              onPressed: () {
-                                                _icon = MyIcons.drugs;
-                                              },
-                                              icon: Icon(MyIcons.drugs,
-                                                  color: _iconColor),
-                                            ),
-                                            IconButton(
-                                              onPressed: () {
-                                                _icon = MyIcons.circle;
-                                              },
-                                              icon: Icon(MyIcons.circle,
-                                                  color: _iconColor),
-                                            ),
-                                            IconButton(
-                                              onPressed: () {
-                                                _icon = MyIcons.oval;
-                                              },
-                                              icon: Icon(MyIcons.oval,
-                                                  color: _iconColor),
-                                            ),
-                                            IconButton(
-                                              onPressed: () {
-                                                _icon = MyIcons.pill_vertical;
-                                              },
-                                              icon: Icon(MyIcons.pill_vertical,
-                                                  color: _iconColor),
-                                            ),
-                                            IconButton(
-                                              onPressed: () {
-                                                _icon = MyIcons.water;
-                                              },
-                                              icon: Icon(MyIcons.water,
-                                                  color: _iconColor),
-                                            ),
-                                            IconButton(
-                                              onPressed: () {
-                                                _icon = MyIcons.vaccine;
-                                              },
-                                              icon: Icon(MyIcons.vaccine,
-                                                  color: _iconColor),
-                                            ),
-                                            IconButton(
-                                              onPressed: () {
-                                                _icon = MyIcons.inhaler;
-                                              },
-                                              icon: Icon(MyIcons.inhaler,
-                                                  color: _iconColor),
-                                            ),
-                                            IconButton(
-                                              onPressed: () {
-                                                _icon = MyIcons.eye_dropper;
-                                              },
-                                              icon: Icon(MyIcons.eye_dropper,
-                                                  color: _iconColor),
-                                            ),
-                                            IconButton(
-                                              onPressed: () {
-                                                _icon = MyIcons.spray;
-                                              },
-                                              icon: Icon(MyIcons.spray,
-                                                  color: _iconColor),
-                                            ),
-                                            IconButton(
-                                              onPressed: () {
-                                                _icon = MyIcons.medicine_bottle;
-                                              },
-                                              icon: Icon(
-                                                  MyIcons.medicine_bottle,
-                                                  color: _iconColor),
-                                            ),
-                                          ],
-                                        ),
+                                children: <Widget>[
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.only(bottom: 15.0),
+                                    child: Text(
+                                      'Medicine Icon',
+                                      style: headingStyle(context),
+                                    ),
+                                  ),
+                                  Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(13),
+                                        color: Colors.black38,
                                       ),
-                                      SizedBox(
-                                        height: 40,
-                                      ),
-                                      SingleChildScrollView(
-                                        scrollDirection: Axis.horizontal,
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceAround,
-                                          children: <Widget>[
-                                            for (var color in colors)
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
-                                                child: GestureDetector(
-                                                  onTap: () => {
-                                                    _changeIconColor(color),
-                                                  },
-                                                  child: CircleAvatar(
-                                                    backgroundColor: color,
-                                                    radius: 15,
-                                                  ),
-                                                ),
-                                              )
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  )),
+                                      padding: const EdgeInsets.all(15),
+                                      child: Column(
+                                        children: <Widget>[
+                                          SingleChildScrollView(
+                                            scrollDirection: Axis.horizontal,
+                                            child: Row(
+                                              children: <Widget>[
+                                                icon(MyIcons.color_pill),
+                                                icon(MyIcons.drugs),
+                                                icon(MyIcons.circle),
+                                                icon(MyIcons.oval),
+                                                icon(MyIcons.pill_vertical),
+                                                icon(MyIcons.water),
+                                                icon(MyIcons.vaccine),
+                                                icon(MyIcons.inhaler),
+                                                icon(MyIcons.eye_dropper),
+                                                icon(MyIcons.spray),
+                                                icon(MyIcons.medicine_bottle),
+                                              ],
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            height: screenSize.height * 0.04,
+                                          ),
+                                          SingleChildScrollView(
+                                            scrollDirection: Axis.horizontal,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceAround,
+                                              children: <Widget>[
+                                                for (var color in colors)
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    child: GestureDetector(
+                                                      onTap: () => {
+                                                        _changeIconColor(color),
+                                                      },
+                                                      child: CircleAvatar(
+                                                        backgroundColor: color,
+                                                        radius: 15,
+                                                      ),
+                                                    ),
+                                                  )
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      )),
+                                ],
+                              )),
+                              //button
+                              ClipRRect(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(25)),
+                                child: RaisedButton(
+                                  elevation: 5,
+                                  color: Theme.of(context).accentColor,
+                                  onPressed: () {
+                                    _save(context);
+                                    notification();
+                                  },
+                                  child: Text(
+                                    'Done',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                              )
                             ],
-                          )),
-                          //button
-                          ClipRRect(
-                            borderRadius: BorderRadius.all(Radius.circular(25)),
-                            child: RaisedButton(
-                              elevation: 5,
-                              color: Theme.of(context).accentColor,
-                              onPressed: () {
-                                _save(context);
-                                notification();
-                              },
-                              child: Text(
-                                'Done',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => notification(),
-        child: Icon(Icons.notifications),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () => notification(),
+            child: Icon(Icons.notifications_paused),
+          ),
+        ),
       ),
     );
   }
 
 /////////////////////////////////// NOTIFICATION////////////////////////////////////////////////////////
-  Future<void> notification() async {
-    String hour = _time.hour.toString();
-    String min = _time.minute.toString().length == 2
-        ? _time.minute.toString()
-        : '0${_time.minute.toString()}';
-    print(date);
-    print(_time.format(context));
-    DateTime now = DateTime.parse("$date $hour:$min:00");
-    //DateTime.now().toUtc().add(Duration(seconds: 5));
-    await singleNotification(
-      localNotificationsPlugin,
-      now,
-      " It's time to take your medicine",
-      'Please Take ${_editedMedicine.amount} ${_editedMedicine.type} of ${_editedMedicine.title}',
-      int.parse((_time.hour.toString() + _time.minute.toString())),
-      _time.format(context),
-      RepeatInterval.Daily,
+  // initializeNotification() async {
+  //   var initiallizeAndroid = AndroidInitializationSettings('ic_launcher');
+  //   var initiallizeIOS = IOSInitializationSettings();
+  //   var initSettings =
+  //       InitializationSettings(initiallizeAndroid, initiallizeIOS);
+  //   await localNotificationsPlugin.initialize(initSettings);
+  // }
+
+  // Future<void> notification() async {
+  //   String hour = _time.hour.toString();
+  //   String min = _time.minute.toString().length == 2
+  //       ? _time.minute.toString()
+  //       : '0${_time.minute.toString()}';
+  //   var time = Time(_time.hour, _time.minute, 0);
+
+  //   DateTime now = DateTime.parse("$date $hour:$min:00");
+  //   //DateTime.now().toUtc().add(Duration(seconds: 5));
+  //   await singleNotification(
+  //     localNotificationsPlugin,
+  //     now,
+  //     " It's time to take your medicine",
+  //     'Please Take ${_editedMedicine.amount} ${_editedMedicine.type} of ${_editedMedicine.title}',
+  //     int.parse((_time.hour.toString() + _time.minute.toString())),
+  //     _time.format(context),
+  //     time,
+  //   );
+  // }
+
+  // Future singleNotification(
+  //   FlutterLocalNotificationsPlugin plugin,
+  //   DateTime date,
+  //   String message,
+  //   String subText,
+  //   int hashcode,
+  //   String channelId,
+  //   Time time,
+  // ) async {
+  //   var androidChannel = AndroidNotificationDetails(
+  //     channelId,
+  //     'chanel-name',
+  //     'chanel-description',
+  //     // sound: 'sound',
+  //     importance: Importance.Max,
+  //     priority: Priority.Max,
+  //   );
+
+  //   var iosChannel = IOSNotificationDetails();
+  //   var platformChannel = NotificationDetails(androidChannel, iosChannel);
+  //   plugin.showDailyAtTime(hashcode, message, subText, time, platformChannel);
+  //   // schedule(hashcode, message, subText, date, platformChannel,
+  //   //     payload: hashCode.toString());
+  // }
+  initializeNotifications() async {
+    var initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/launcher_icon');
+    var initializationSettingsIOS = IOSInitializationSettings();
+    var initializationSettings = InitializationSettings(
+        initializationSettingsAndroid, initializationSettingsIOS);
+    await localNotificationsPlugin.initialize(
+      initializationSettings,
     );
   }
 
-  Future singleNotification(
-    FlutterLocalNotificationsPlugin plugin,
-    DateTime date,
-    String message,
-    String subText,
-    int hashcode,
-    String channelId,
-    RepeatInterval interval,
-  ) {
-    var androidChannel = AndroidNotificationDetails(
-      channelId,
-      'chanel-name',
-      'chanel-description',
+  Future<void> notification() async {
+    var hour = _time.hour;
+    var minute = _time.minute;
+
+    // var hour = int.parse(medicine.startTime[0] + medicine.startTime[1]);
+    var ogValue = hour;
+    // var minute = int.parse(medicine.startTime[2] + medicine.startTime[3]);
+    // print("object");
+    // print(medicine.startTime[0] + medicine.startTime[1]);
+    // print(medicine.startTime[2] + medicine.startTime[3]);
+
+    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      'repeatDailyAtTime channel id',
+      'repeatDailyAtTime channel name',
+      'repeatDailyAtTime description',
       importance: Importance.Max,
-      priority: Priority.Max,
+      ledColor: Color(0xFF3EB16F),
+      ledOffMs: 1000,
+      ledOnMs: 1000,
+      enableLights: true,
     );
-    print('Channel-Id $hashcode');
-    var iosChannel = IOSNotificationDetails();
-    var platformChannel = NotificationDetails(androidChannel, iosChannel);
-    plugin
-        .
-        // periodicallyShow(
-        //     hashcode, message, subText, interval, platformChannel);
-        schedule(hashcode, message, subText, date, platformChannel,
-            payload: hashCode.toString());
+    var iOSPlatformChannelSpecifics = IOSNotificationDetails();
+    var platformChannelSpecifics = NotificationDetails(
+        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+
+    // for (int i = 0; i < (24 / medicine.interval).floor(); i++) {
+    //   if ((hour + (medicine.interval * i) > 23)) {
+    //     hour = hour + (medicine.interval * i) - 24;
+    //   } else {
+    //     hour = hour + (medicine.interval * i);
+    //   }
+    await localNotificationsPlugin.showDailyAtTime(
+      hour,
+      'Mediminder:medicine.title}',
+      'It is time to take your medicine, according to schedule',
+      Time(hour, minute, 0),
+      platformChannelSpecifics,
+    );
+    hour = ogValue;
   }
+  //await flutterLocalNotificationsPlugin.cancelAll();
+
 }

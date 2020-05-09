@@ -22,6 +22,6 @@ class Medicine with ChangeNotifier {
     @required this.date,
     @required this.type,
     @required this.instruction,
-    @required this.note,
+    this.note,
   });
 }

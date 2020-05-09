@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
+import 'package:test_dasd/widgets/animation.dart';
 
 import '../model/medicine_prrovider.dart';
 import '../model/Medicine.dart';
@@ -43,7 +44,7 @@ class _MedicineSceduleState extends State<MedicineScedule> {
     String subText,
     int hashcode,
     String channelId,
-  ) {
+  ) async {
     var androidChannel = AndroidNotificationDetails(
       channelId,
       'chanel-name',
@@ -97,6 +98,51 @@ class _MedicineSceduleState extends State<MedicineScedule> {
     }
   }
 
+  Future<Null> _selectTime(
+      BuildContext context, String title, double amount) async {
+    final TimeOfDay picked = await showTimePicker(
+      context: context,
+      initialTime: time,
+    );
+
+    if (picked != null) {
+      setState(
+        () {
+          time = picked;
+          time = time;
+
+          _medicineLog = MedicineLog(
+            title: title,
+            amount: amount,
+            time: time.format(context),
+            date: DateTime.now().toString(),
+            status: 'Taken',
+            reasons: reasons,
+          );
+
+          text = 'Taken at ${time.format(context)}';
+          color = Colors.green;
+        },
+      );
+    }
+    _save(context);
+    Navigator.of(context).pop();
+  }
+
+  Future<void> notification(
+      String amount, String title, int min, String type) async {
+    DateTime now = DateTime.now().toUtc().add(Duration(seconds: min));
+
+    await singleNotification(
+      localNotificationsPlugin,
+      now,
+      " It's time to take your medicine",
+      'Please Take $amount $type of $title',
+      int.parse((time.hour.toString() + time.minute.toString())),
+      time.format(context),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     Color colors = Theme.of(context).primaryColor;
@@ -104,49 +150,6 @@ class _MedicineSceduleState extends State<MedicineScedule> {
     var time = TimeOfDay.now();
     int min;
     print('this is medicine color ${medicine.title}');
-
-    Future<void> notification() async {
-      DateTime now = DateTime.now().toUtc().add(Duration(minutes: min));
-
-      await singleNotification(
-        localNotificationsPlugin,
-        now,
-        " It's time to take your medicine",
-        'Please Take ${medicine.amount} ${medicine.type} of ${medicine.title}',
-        int.parse((time.hour.toString() + time.minute.toString())),
-        time.format(context),
-      );
-    }
-
-    Future<Null> _selectTime(BuildContext context) async {
-      final TimeOfDay picked = await showTimePicker(
-        context: context,
-        initialTime: time,
-      );
-
-      if (picked != null) {
-        setState(
-          () {
-            time = picked;
-            time = time;
-
-            _medicineLog = MedicineLog(
-              title: medicine.title,
-              amount: medicine.amount,
-              time: time.format(context),
-              date: DateTime.now().toString(),
-              status: 'Taken',
-              reasons: reasons,
-            );
-
-            text = 'Taken at ${time.format(context)}';
-            color = Colors.green;
-          },
-        );
-      }
-      _save(context);
-      Navigator.of(context).pop();
-    }
 
     Widget taken() {
       return Container(
@@ -213,7 +216,11 @@ class _MedicineSceduleState extends State<MedicineScedule> {
                 height: 10,
               ),
               FlatButton(
-                onPressed: () => _selectTime(context),
+                onPressed: () => _selectTime(
+                  context,
+                  medicine.title,
+                  medicine.amount,
+                ),
                 child: Text('Pick Specific Time'),
               ),
             ],
@@ -244,7 +251,8 @@ class _MedicineSceduleState extends State<MedicineScedule> {
                   setState(() {
                     min = 5;
                   });
-                  notification();
+                  notification(medicine.amount.toString(), medicine.type, min,
+                      medicine.title);
                   Navigator.of(context).pop();
                 },
                 child: Text('5 Minutes from ${time.format(context)}'),
@@ -257,7 +265,8 @@ class _MedicineSceduleState extends State<MedicineScedule> {
                   setState(() {
                     min = 10;
                   });
-                  notification();
+                  notification(medicine.amount.toString(), medicine.type, min,
+                      medicine.title);
                   Navigator.of(context).pop();
                 },
                 child: Text('10 Minutes from ${time.format(context)}'),
@@ -270,7 +279,8 @@ class _MedicineSceduleState extends State<MedicineScedule> {
                   setState(() {
                     min = 30;
                   });
-                  notification();
+                  notification(medicine.amount.toString(), medicine.type, min,
+                      medicine.title);
                   Navigator.of(context).pop();
                 },
                 child: Text('30 Minutes from ${time.format(context)}'),
@@ -283,7 +293,8 @@ class _MedicineSceduleState extends State<MedicineScedule> {
                   setState(() {
                     min = 60;
                   });
-                  notification();
+                  notification(medicine.amount.toString(), medicine.type, min,
+                      medicine.title);
                   Navigator.of(context).pop();
                 },
                 child: Text('1 hr from ${time.format(context)}'),
@@ -393,157 +404,166 @@ class _MedicineSceduleState extends State<MedicineScedule> {
       );
     }
 
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
-      elevation: 8,
-      child: Container(
-        child: Column(
-          children: <Widget>[
-            Container(
-              decoration: BoxDecoration(
+    return SideInAnimation(
+      delay: 1,
+      child: Card(
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+        elevation: 8,
+        child: Container(
+          child: Column(
+            children: <Widget>[
+              Container(
+                decoration: BoxDecoration(
                   borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                   gradient: LinearGradient(
-                      end: Alignment.topLeft,
-                      begin: Alignment.bottomRight,
-                      colors: <Color>[
-                        colors.withOpacity(0.5),
-                        colors.withOpacity(0.9),
-                        colors,
-                      ])),
-              height: 50,
-              child: Center(
-                  child: Text(
-                medicine.time,
-                style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 25),
-              )),
-            ),
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.005),
-                  borderRadius:
-                      BorderRadius.vertical(bottom: Radius.circular(20))),
-              child: ExpansionTile(
-                title: ListTile(
-                  leading: Container(
-                    child: CircleAvatar(
-                      radius: 40,
-                      backgroundColor: medicine.color == Colors.white70.value
-                          ? Colors.black87
-                          : Colors.black12,
-                      child: Hero(tag: medicine.id, child: medicine.icon),
-                    ),
-                  ),
-                  title: Padding(
-                    padding: const EdgeInsets.only(bottom: 10.0),
-                    child: Text(
-                      medicine.title,
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                    ),
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text('Take ${medicine.amount.toString()}'),
-                      Text(text, style: TextStyle(color: color))
+                    end: Alignment.topLeft,
+                    begin: Alignment.bottomRight,
+                    colors: <Color>[
+                      colors.withOpacity(0.5),
+                      colors.withOpacity(0.9),
+                      colors,
                     ],
                   ),
                 ),
-                children: <Widget>[
-                  Container(
-                    height: 100,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(width: 1, color: Colors.grey)),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: <Widget>[
-                            Column(
-                              children: <Widget>[
-                                IconButton(
-                                  icon: Icon(
-                                    Icons.check,
-                                    color: colors,
-                                  ),
-                                  iconSize: 35,
-                                  onPressed: () {
-                                    _action(context);
-
-                                    setState(() {
-                                      status = "Taken";
-                                      text = 'Taken ';
-                                      color = Colors.green;
-                                    });
-                                  },
-                                ),
-                                Text(
-                                  'Taken',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                )
-                              ],
-                            ),
-                            Column(
-                              children: <Widget>[
-                                IconButton(
-                                  icon: Icon(Icons.snooze,
-                                      color: Color.fromRGBO(240, 208, 0, 1)),
-                                  iconSize: 35,
-                                  onPressed: () {
-                                    _action(context);
-                                    setState(() {
-                                      status = 'Snoozed';
-                                      text = 'Snoozed';
-                                      color = Colors.deepOrange;
-                                    });
-                                  },
-                                ),
-                                Text(
-                                  'Snooze',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                )
-                              ],
-                            ),
-                            Column(
-                              children: <Widget>[
-                                IconButton(
-                                  icon: Icon(
-                                    Icons.cancel,
-                                    color: Colors.red,
-                                  ),
-                                  iconSize: 35,
-                                  onPressed: () {
-                                    _action(context);
-
-                                    setState(() {
-                                      status = 'cancel';
-                                      text = 'Skipped ';
-                                      color = Colors.red;
-                                    });
-                                  },
-                                ),
-                                Text(
-                                  'Skip',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                )
-                              ],
-                            ),
-                          ],
-                        ),
+                height: 50,
+                child: Center(
+                    child: Text(
+                  medicine.time,
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 25),
+                )),
+              ),
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.005),
+                    borderRadius:
+                        BorderRadius.vertical(bottom: Radius.circular(20))),
+                child: ExpansionTile(
+                  title: ListTile(
+                    leading: Container(
+                      child: CircleAvatar(
+                        radius: 40,
+                        backgroundColor: medicine.color == Colors.white70.value
+                            ? Colors.black87
+                            : Colors.black12,
+                        child: Hero(tag: medicine.id, child: medicine.icon),
                       ),
                     ),
-                  )
-                ],
-              ),
-            )
-          ],
+                    title: Padding(
+                      padding: const EdgeInsets.only(bottom: 10.0),
+                      child: Text(
+                        medicine.title,
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 20),
+                      ),
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text('Take ${medicine.amount.toString()}'),
+                        Text(text, style: TextStyle(color: color))
+                      ],
+                    ),
+                  ),
+                  children: <Widget>[
+                    Container(
+                      height: 100,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(width: 1, color: Colors.grey)),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: <Widget>[
+                              Column(
+                                children: <Widget>[
+                                  IconButton(
+                                    icon: Icon(
+                                      Icons.check,
+                                      color: colors,
+                                    ),
+                                    iconSize: 35,
+                                    onPressed: () {
+                                      _action(context);
+
+                                      setState(() {
+                                        status = "Taken";
+                                        text = 'Taken ';
+                                        color = Colors.green;
+                                      });
+                                    },
+                                  ),
+                                  Text(
+                                    'Taken',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  )
+                                ],
+                              ),
+                              Column(
+                                children: <Widget>[
+                                  IconButton(
+                                    icon: Icon(Icons.snooze,
+                                        color: Color.fromRGBO(240, 208, 0, 1)),
+                                    iconSize: 35,
+                                    onPressed: () {
+                                      _action(context);
+                                      setState(() {
+                                        status = 'Snoozed';
+                                        text = 'Snoozed';
+                                        color = Colors.deepOrange;
+                                      });
+                                    },
+                                  ),
+                                  Text(
+                                    'Snooze',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  )
+                                ],
+                              ),
+                              Column(
+                                children: <Widget>[
+                                  IconButton(
+                                    icon: Icon(
+                                      Icons.cancel,
+                                      color: Colors.red,
+                                    ),
+                                    iconSize: 35,
+                                    onPressed: () {
+                                      _action(context);
+
+                                      setState(() {
+                                        status = 'cancel';
+                                        text = 'Skipped ';
+                                        color = Colors.red;
+                                      });
+                                    },
+                                  ),
+                                  Text(
+                                    'Skip',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  )
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

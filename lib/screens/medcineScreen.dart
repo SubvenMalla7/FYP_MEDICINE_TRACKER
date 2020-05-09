@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
-import 'package:test_dasd/screens/medicines_screen.dart';
-import 'package:test_dasd/widgets/buildCard_widget.dart';
 
 import '../model/Medicine.dart';
 import '../model/medicine_prrovider.dart';
-import '../screens/add_screen.dart';
+import '../screens/medicines_screen.dart';
+import '../widgets/buildCard_widget.dart';
+import './add_screen.dart';
 
 class SingleMedicine extends StatelessWidget {
   static const routeName = '/medicine';
@@ -14,173 +13,162 @@ class SingleMedicine extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Medicine medicine = ModalRoute.of(context).settings.arguments;
-    var date = DateFormat('yyyy-mm-dd').format(DateTime.now());
-    print(date);
+    // var date = DateFormat('yyyy-mm-dd').format(DateTime.now());
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          medicine.title,
-          textAlign: TextAlign.center,
-          semanticsLabel: 'Medicine Name',
-          style: TextStyle(fontSize: 25, fontWeight: FontWeight.w700),
-        ),
-        actions: <Widget>[
+      body: Column(
+        children: <Widget>[
           Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: IconButton(
-              onPressed: () {
-                Navigator.of(context).pushReplacementNamed(AddScreen.routeName,
-                    arguments: medicine.id);
-              },
-              icon: Icon(Icons.edit,
-                  color: Theme.of(context).accentColor, size: 30),
-            ),
-          )
-        ],
-      ),
-      body: Container(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 40, vertical: 10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Container(
-                child: Row(
-                  children: <Widget>[
-                    CircleAvatar(
-                        radius: 40,
-                        backgroundColor: medicine.color == Colors.white70.value
-                            ? Colors.black87
-                            : Colors.black12,
-                        child: medicine.icon),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 80.0),
-                      child: Column(
-                        children: <Widget>[
-                          Material(
-                            color: Colors.transparent,
-                            child: MainTabInfo(
-                              fieldTitle: "Medicine Name",
-                              fieldInfo: medicine.title,
+            padding: const EdgeInsets.only(top: 50.0),
+            child: customAppBar(
+                context,
+                Icons.arrow_back,
+                Colors.white,
+                medicine.title,
+                Icons.edit,
+                Theme.of(context).accentColor,
+                () => Navigator.of(context).pop(), () {
+              Navigator.of(context).pushReplacementNamed(AddScreen.routeName,
+                  arguments: medicine.id);
+            }),
+          ),
+          Container(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 40, vertical: 5),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Container(
+                    child: Row(
+                      children: <Widget>[
+                        CircleAvatar(
+                            radius: 40,
+                            backgroundColor:
+                                medicine.color == Colors.white70.value
+                                    ? Colors.black87
+                                    : Colors.black12,
+                            child: medicine.icon),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 80.0),
+                          child: Column(
+                            children: <Widget>[
+                              Material(
+                                color: Colors.transparent,
+                                child: MainTabInfo(
+                                  fieldTitle: "Medicine Name",
+                                  fieldInfo: medicine.title,
+                                ),
+                              ),
+                              MainTabInfo(
+                                fieldTitle: "Dosage",
+                                fieldInfo: medicine.amount == 0
+                                    ? "Not Specified"
+                                    : medicine.amount.toString() + " mg",
+                              )
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    child: ListView(
+                      shrinkWrap: true,
+                      children: <Widget>[
+                        Row(
+                          children: <Widget>[
+                            ExtendedInfoTab(
+                              fieldTitle: "Medicine Type",
+                              fieldInfo: medicine.type.length == 0
+                                  ? "No Type"
+                                  : medicine.type,
+                            ),
+                            SizedBox(
+                              width: 60,
+                            ),
+                            ExtendedInfoTab(
+                              fieldTitle: "Instruction ",
+                              fieldInfo: medicine.instruction.length == 0
+                                  ? "No instruction"
+                                  : medicine.instruction,
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: <Widget>[
+                            ExtendedInfoTab(
+                              fieldTitle: "Start Time",
+                              fieldInfo: medicine.time,
+                            ),
+                            SizedBox(
+                              width: 90,
+                            ),
+                            ExtendedInfoTab(
+                                fieldTitle: "Start Date ",
+                                fieldInfo: medicine.date.toString()),
+                          ],
+                        ),
+                        ExtendedInfoTab(
+                          fieldTitle: "Notes",
+                          fieldInfo: medicine.note.length == 0
+                              ? 'No Notes'
+                              : medicine.note,
+                        ),
+                      ],
+                    ),
+                  ),
+                  VerticalDivider(
+                    thickness: 5,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(
+                        left: MediaQuery.of(context).size.height * 0.06,
+                        right: MediaQuery.of(context).size.height * 0.06,
+                        top: 45),
+                    child: Container(
+                      width: 280,
+                      height: 70,
+                      child: FlatButton(
+                        color: Theme.of(context).errorColor,
+                        shape: StadiumBorder(),
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (ctx) => deleteDialog(
+                              context,
+                              "Do You want to delete ${medicine.title} ?",
+                              () async {
+                                try {
+                                  await Provider.of<Medicines>(context,
+                                          listen: false)
+                                      .deleteMeds(medicine.id);
+                                  Navigator.of(context).pushReplacementNamed(
+                                      MedicineScreen.routeName);
+                                } catch (error) {
+                                  throw error.toString();
+                                }
+                              },
+                            ),
+                          );
+                        },
+                        child: Center(
+                          child: Text(
+                            "Delete Medicine",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
-                          MainTabInfo(
-                            fieldTitle: "Dosage",
-                            fieldInfo: medicine.amount == 0
-                                ? "Not Specified"
-                                : medicine.amount.toString() + " mg",
-                          )
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: 15,
-              ),
-              Container(
-                child: ListView(
-                  shrinkWrap: true,
-                  children: <Widget>[
-                    Row(
-                      children: <Widget>[
-                        ExtendedInfoTab(
-                          fieldTitle: "Medicine Type",
-                          fieldInfo: medicine.type.length == 0
-                              ? "No Type"
-                              : medicine.type,
-                        ),
-                        SizedBox(
-                          width: 60,
-                        ),
-                        ExtendedInfoTab(
-                          fieldTitle: "Instruction ",
-                          fieldInfo: medicine.instruction.length == 0
-                              ? "No instruction"
-                              : medicine.instruction,
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: <Widget>[
-                        ExtendedInfoTab(
-                          fieldTitle: "Start Time",
-                          fieldInfo: medicine.time,
-                        ),
-                        SizedBox(
-                          width: 90,
-                        ),
-                        ExtendedInfoTab(
-                            fieldTitle: "Start Date ",
-                            fieldInfo: medicine.date.toString()),
-                      ],
-                    ),
-                    ExtendedInfoTab(
-                      fieldTitle: "Dose ",
-                      fieldInfo: medicine.amount.toString(),
-                    ),
-                    ExtendedInfoTab(
-                      fieldTitle: "Notes",
-                      fieldInfo: medicine.note.length == 0
-                          ? 'No Notes'
-                          : medicine.note,
-                    ),
-                  ],
-                ),
-              ),
-              VerticalDivider(
-                thickness: 5,
-              ),
-              //ExtendedSection(medicine: medicine),
-              Padding(
-                padding: EdgeInsets.only(
-                  left: MediaQuery.of(context).size.height * 0.06,
-                  right: MediaQuery.of(context).size.height * 0.06,
-                  top: 25,
-                ),
-                child: Container(
-                  width: 280,
-                  height: 70,
-                  child: FlatButton(
-                    color: Theme.of(context).errorColor,
-                    shape: StadiumBorder(),
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (ctx) => deleteDialog(
-                          context,
-                          "Do You want to delete ${medicine.title} ?",
-                          () async {
-                            try {
-                              await Provider.of<Medicines>(context,
-                                      listen: false)
-                                  .deleteMeds(medicine.id);
-                              Navigator.of(context).pushReplacementNamed(
-                                  MedicineScreen.routeName);
-                            } catch (error) {
-                              print('This is an eror $error');
-                            }
-                          },
-                        ),
-                      );
-                    },
-                    child: Center(
-                      child: Text(
-                        "Delete Medicine",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),
                   ),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

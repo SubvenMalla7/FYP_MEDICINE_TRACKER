@@ -44,20 +44,12 @@ class Medicines with ChangeNotifier {
 
       final List<Medicine> loadedMedicine = [];
       var data = extractedData;
-      print('object');
-      print(id);
-      print(extractedData);
 
-      // try {
-      //print(data.length);
       data.forEach((medData) {
         var icon = MyIcons.color_pill;
 
         var _color;
-        //print(medData);
-        //print(medData['amount'].runtimeType);
-        // print('${int.parse(medData['color'])} is fromdata');
-        // print(Colors.white.value);
+
         if (Colors.white70.value == int.parse(medData['color'])) {
           _color = Colors.white;
         }
@@ -79,7 +71,7 @@ class Medicines with ChangeNotifier {
         if (Colors.black.value == int.parse(medData['color'])) {
           _color = Colors.black;
         }
-        //print('lol1');
+
         ////////////////////////ICONS///////////////////////////////////
         if (MyIcons.color_pill.codePoint == int.parse(medData['icon'])) {
           icon = MyIcons.color_pill;
@@ -139,10 +131,9 @@ class Medicines with ChangeNotifier {
               type: medData['type']),
         );
       });
-      //print('lol');
+
       _items = loadedMedicine;
-      //print('loaded is $loadedMedicine');
-      //print('lol');
+
       notifyListeners();
     } catch (error) {
       //throw error;
@@ -151,13 +142,7 @@ class Medicines with ChangeNotifier {
 
   Future<void> addMedicines(Medicine medicine) async {
     final url = 'http://192.168.0.103:8000/api/medicine?api_token=$authtoken';
-    // const url='http://192.168.0.103:8000/api/medicine';
 
-    print("icon.icon.codePoint");
-    print(medicine.title);
-    print(authtoken);
-    print(id);
-    // try {
     final response = await http.post(
       url,
       headers: headers,
@@ -174,13 +159,6 @@ class Medicines with ChangeNotifier {
         'note': medicine.note,
       }),
     );
-    // icon=medicine.icon;
-    // color=medicine.color;
-    print(medicine.icon);
-    print('object');
-    print(medicine.type);
-    print(medicine.instruction);
-    print(medicine.note);
 
     final newMedicine = Medicine(
       id: json.decode(response.body)['data']['id'].toString(),
@@ -194,17 +172,12 @@ class Medicines with ChangeNotifier {
       note: medicine.note,
       type: medicine.type,
     );
-    //    print(json.decode(response.body)['data']['id']);
+
     _items.add(newMedicine);
     notifyListeners();
-    // } catch (error) {
-    //   print(error);
-    //   throw error;
-    // }
   }
 
   Future<void> updateMedicine(String id, Medicine newMeds) async {
-    print(newMeds.instruction);
     final medIndex = _items.indexWhere((meds) => meds.id == id);
     final url =
         'http://192.168.0.103:8000/api/medicine/$id?api_token=$authtoken';
@@ -222,7 +195,7 @@ class Medicines with ChangeNotifier {
         "note": newMeds.date
       }),
     );
-    print(newMeds.instruction);
+
     if (medIndex >= 0) {
       _items[medIndex] = newMeds;
       notifyListeners();
@@ -278,12 +251,8 @@ class Medicines with ChangeNotifier {
       status: medicineLog.status,
       reasons: medicineLog.reasons,
     );
-    //    print(json.decode(response.body)['data']['id']);
+
     _logitems.add(newMedicineLog);
     notifyListeners();
-    // } catch (error) {
-    //   print(error);
-    //   throw error;
-    // }
   }
 }

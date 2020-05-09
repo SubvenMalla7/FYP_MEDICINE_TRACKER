@@ -1,98 +1,119 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:test_dasd/screens/medcineScreen.dart';
 
+import '../widgets/buildCard_widget.dart';
+import '../screens/medcineScreen.dart';
 import '../widgets/user_medicines.dart';
 import '../model/medicine_prrovider.dart';
-
 // import './add_medicines.dart';
+import '../widgets/app_drawer.dart';
 import './add_screen.dart';
 
 class MedicineScreen extends StatelessWidget {
   static const routeName = '/medicines';
 
-  Future<void> _refreshMedicines(BuildContext context) async {
-    await Provider.of<Medicines>(context, listen: false).fetchAndSetMeds();
-  }
-
   @override
   Widget build(BuildContext context) {
     final medicineData = Provider.of<Medicines>(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Medicines'),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () =>
-                Navigator.of(context).pushNamed(AddScreen.routeName),
-          )
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: () => Navigator.of(context).pushNamed(AddScreen.routeName),
-      ),
-      body: RefreshIndicator(
-        onRefresh: () => _refreshMedicines(context),
-        child: Container(
-          color: Theme.of(context).backgroundColor,
-          child: Padding(
-            padding: const EdgeInsets.all(8),
-            child: ListView.builder(
-              itemCount: medicineData.items.length,
-              itemBuilder: (_, i) => Column(
-                children: <Widget>[
-                  Dismissible(
-                    key: Key(medicineData.items[i].id),
-                    direction: DismissDirection.endToStart,
-                    background: Container(
-                      color: Theme.of(context).errorColor,
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Icon(
-                            Icons.delete,
-                            size: 30,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                    onDismissed: (direction) async {
-                      await Provider.of<Medicines>(context, listen: false)
-                          .deleteMeds(medicineData.items[i].id);
-                    },
-                    child: InkWell(
-                      onTap: () => {
-                        Navigator.of(context).pushNamed(
-                            SingleMedicine.routeName,
-                            arguments: medicineData.items[i])
-                      },
-                      child: Column(
-                        children: <Widget>[
-                          Hero(
-                              tag: medicineData.items[i].id,                        child: UserMedicines(
-                              medicineData.items[i].id,
-                              medicineData.items[i].icon,
-                              medicineData.items[i].title,
-                              medicineData.items[i].color,
-                            ),
-                          ),
-                          Divider(
-                            thickness: 2,
-                          ),
-                        ],
-                      ),
+    final screenSize = MediaQuery.of(context).size;
+    return SafeArea(
+      top: true,
+      child: Padding(
+        padding: const EdgeInsets.only(left: 2.0, right: 2.0),
+        child: Scaffold(
+            drawer: AppDrawer(),
+            floatingActionButton: FloatingActionButton(
+              child: Icon(Icons.add),
+              onPressed: () =>
+                  Navigator.of(context).pushNamed(AddScreen.routeName),
+            ),
+            body: CustomScrollView(
+              slivers: <Widget>[
+                SliverAppBar(
+                  forceElevated: true,
+                  shape: ContinuousRectangleBorder(
+                      borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(120),
+                          bottomRight: Radius.circular(120))),
+                  expandedHeight: screenSize.height * 0.25,
+                  pinned: true,
+                  elevation: 0,
+                  backgroundColor: Theme.of(context).primaryColor,
+                  flexibleSpace: FlexibleSpaceBar(
+                    title: Text(
+                      'Medicines',
+                      style: textStyle(Colors.white),
                     ),
                   ),
-                  Divider()
-                ],
-              ),
-            ),
-          ),
-        ),
+                  actions: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.only(right: 10),
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.add,
+                          color: Colors.white,
+                          size: 30,
+                        ),
+                        onPressed: () => Navigator.of(context)
+                            .pushNamed(AddScreen.routeName),
+                      ),
+                    )
+                  ],
+                ),
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, i) => Column(
+                      children: <Widget>[
+                        Dismissible(
+                          key: Key(medicineData.items[i].id),
+                          direction: DismissDirection.endToStart,
+                          background: Container(
+                            color: Theme.of(context).errorColor,
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Icon(
+                                  Icons.delete,
+                                  size: 30,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                          onDismissed: (direction) async {
+                            await Provider.of<Medicines>(context, listen: false)
+                                .deleteMeds(medicineData.items[i].id);
+                          },
+                          child: InkWell(
+                            onTap: () => {
+                              Navigator.of(context).pushNamed(
+                                  SingleMedicine.routeName,
+                                  arguments: medicineData.items[i])
+                            },
+                            child: Column(
+                              children: <Widget>[
+                                UserMedicines(
+                                  medicineData.items[i].id,
+                                  medicineData.items[i].icon,
+                                  medicineData.items[i].title,
+                                  medicineData.items[i].color,
+                                ),
+                                SizedBox(
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.02,
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    childCount: medicineData.items.length,
+                  ),
+                )
+              ],
+            )),
       ),
     );
   }

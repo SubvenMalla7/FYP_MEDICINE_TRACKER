@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 
 import '../my_icons_icons.dart';
@@ -11,11 +9,6 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   @override
-  void initState() {
-    Timer(Duration(seconds: 5), () {});
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

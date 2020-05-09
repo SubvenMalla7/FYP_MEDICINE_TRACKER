@@ -28,8 +28,6 @@ class _MapState extends State<Map> {
     try {
       currentLocation = await location.getLocation();
 
-      print("locationLatitude: ${currentLocation.latitude}");
-      print("locationLongitude: ${currentLocation.longitude}");
       setState(
           () {}); //rebuild the widget after getting the current location of the user
     } on Exception {
@@ -51,6 +49,8 @@ class _MapState extends State<Map> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
+          shape: StadiumBorder(),
+          centerTitle: true,
           title: Padding(
             padding: const EdgeInsets.only(left: 48.0),
             child: Text('Hospital Locations'),
@@ -144,6 +144,16 @@ class _MapState extends State<Map> {
     );
   }
 
+  Widget star() {
+    return Container(
+      child: Icon(
+        FontAwesomeIcons.solidStar,
+        color: Colors.amber,
+        size: 15.0,
+      ),
+    );
+  }
+
   Widget hospitalDetails(String hospitalName) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -172,41 +182,11 @@ class _MapState extends State<Map> {
                 fontSize: 18.0,
               ),
             )),
-            Container(
-              child: Icon(
-                FontAwesomeIcons.solidStar,
-                color: Colors.amber,
-                size: 15.0,
-              ),
-            ),
-            Container(
-              child: Icon(
-                FontAwesomeIcons.solidStar,
-                color: Colors.amber,
-                size: 15.0,
-              ),
-            ),
-            Container(
-              child: Icon(
-                FontAwesomeIcons.solidStar,
-                color: Colors.amber,
-                size: 15.0,
-              ),
-            ),
-            Container(
-              child: Icon(
-                FontAwesomeIcons.solidStar,
-                color: Colors.amber,
-                size: 15.0,
-              ),
-            ),
-            Container(
-              child: Icon(
-                FontAwesomeIcons.solidStarHalf,
-                color: Colors.amber,
-                size: 15.0,
-              ),
-            ),
+            star(),
+            star(),
+            star(),
+            star(),
+            star(),
             Container(
                 child: Text(
               "(946)",

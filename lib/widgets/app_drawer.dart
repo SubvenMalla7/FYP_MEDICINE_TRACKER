@@ -2,130 +2,181 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
+
 import '../model/auth.dart';
 import '../my_icons_icons.dart';
 import '../screens/user_profile.dart';
 import '../screens/medicines_screen.dart';
 import '../screens/maps&phones.dart';
 import '../screens/measurements.dart';
+import '../screens/tab_screen.dart';
 
 class AppDrawer extends StatelessWidget {
+  static const routeName = '/appbar';
   @override
   Widget build(BuildContext context) {
-    final userdata= Provider.of<Auth>(context);
-    return Drawer(
-      child: Column(
-        children: <Widget>[
-          Container(
-            color: Theme.of(context).primaryColor,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: GestureDetector(
-                onTap: () =>
-                    Navigator.of(context).pushNamed(UserProfile.routeName),
-                child: UserAccountsDrawerHeader(
-                  accountName: Text(
-                    userdata.name,
-                    style: TextStyle(
-                      color: Colors.white,
-                    ),
-                  ),
-                  accountEmail: Text(
-                    userdata.email,
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  currentAccountPicture: CircleAvatar(
-                    child: Icon(Icons.person),
-                  ),
-                  decoration: BoxDecoration(
+    TextStyle textStyle() {
+      return TextStyle(
+          color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold);
+    }
+final screenSize=MediaQuery.of(context).size;
+    final userdata = Provider.of<Auth>(context);
+    return Container(
+      padding: const EdgeInsets.only(top: 35),
+      //height: 740,
+      height: screenSize.height*0.88,
+      width: screenSize.width*0.5,
+      child: ClipRRect(
+        borderRadius: BorderRadius.horizontal(right: Radius.circular(30)),
+        child: Drawer(
+          elevation: 10,
+          child: Container(
+            child: Column(
+              children: <Widget>[
+                GestureDetector(
+                  onTap: () =>
+                      Navigator.of(context).pushNamed(UserProfile.routeName),
+                  child: Container(
                     color: Theme.of(context).primaryColor,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        height: 160,
+                        width: double.infinity,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Container(
+                                height: 70,
+                                width: 70,
+                                child: CircleAvatar(
+                                  child: Icon(
+                                    Icons.person,
+                                    size: 40,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              Text(
+                                userdata.name,
+                                style: textStyle(),
+                              ),
+                              Text(
+                                userdata.email,
+                                style: textStyle(),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-          ),
-          Divider(),
-          ListTile(
-            leading: Icon(
-              MyIcons.ruler,
-              color: Theme.of(context).accentColor,
-            ),
-            title: Text(
-              'Body Measurement',
-            ),
-            onTap: () {
-              Navigator.of(context).pushReplacementNamed(Measurement.routeName);
-            },
-          ),
-          Divider(
-            thickness: 3,
-          ),
-          ListTile(
-            leading: Icon(
-              FontAwesomeIcons.mapMarked,
-              color: Theme.of(context).accentColor,
-            ),
-            title: Text('Maps'),
-            onTap: () {
-              Navigator.of(context).pushNamed(Map.routeName);
-            },
-          ),
-          Divider(
-            thickness: 3,
-          ),
-          ListTile(
-            leading: Icon(
-              MyIcons.medicine_bottle,
-              color: Theme.of(context).accentColor,
-            ),
-            title: Text('Medicines'),
-            onTap: () {
-              Navigator.of(context).pushNamed(MedicineScreen.routeName);
-              Navigator.pop(context);
-            },
-          ),
-          Divider(
-            thickness: 3,
-          ),
-          SizedBox(
-            height: 200,
-          ),
-          Container(
-            height: 50,
-            width: 250,
-            child: FlatButton(
-              color: Theme.of(context).errorColor,
-              shape: StadiumBorder(),
-              onPressed: () {
-                Navigator.of(context).pushReplacementNamed('/');
-                Provider.of<Auth>(context, listen: false).logout();
-              },
-              child: Row(
-                children: <Widget>[
-                  SizedBox(
-                    width: 20,
+                Divider(),
+                ListTile(
+                  leading: Icon(
+                    Icons.dashboard,
+                    color: Theme.of(context).accentColor,
                   ),
-                  Icon(
-                    Icons.exit_to_app,
-                    size: 25,
-                    color: Colors.white,
+                  title: Text(
+                    'Dashboard',
                   ),
-                  SizedBox(
-                    width: 20,
+                  onTap: () {
+                    Navigator.of(context)
+                        .pushReplacementNamed(TabsScreen.routeName);
+                  },
+                ),
+                Divider(
+                  thickness: 3,
+                ),
+                ListTile(
+                  leading: Icon(
+                    MyIcons.ruler,
+                    color: Theme.of(context).accentColor,
                   ),
-                  Text(
-                    "Logout",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
+                  title: Text(
+                    'Body Measurement',
+                  ),
+                  onTap: () {
+                    Navigator.of(context)
+                        .pushReplacementNamed(Measurement.routeName);
+                  },
+                ),
+                Divider(
+                  thickness: 3,
+                ),
+                ListTile(
+                  leading: Icon(
+                    FontAwesomeIcons.mapMarkedAlt,
+                    color: Theme.of(context).accentColor,
+                  ),
+                  title: Text('Maps'),
+                  onTap: () {
+                    Navigator.of(context).pushNamed(Map.routeName);
+                  },
+                ),
+                Divider(
+                  thickness: 3,
+                ),
+                ListTile(
+                  leading: Icon(
+                    MyIcons.medicine_bottle,
+                    color: Theme.of(context).accentColor,
+                  ),
+                  title: Text('Medicines'),
+                  onTap: () {
+                    Navigator.of(context).pushNamed(MedicineScreen.routeName);
+                  },
+                ),
+                Divider(
+                  thickness: 3,
+                ),
+                SizedBox(
+                  height: 120,
+                ),
+                Container(
+                  height: 50,
+                  width: 180,
+                  child: FlatButton(
+                    color: Theme.of(context).errorColor,
+                    shape: StadiumBorder(),
+                    onPressed: () {
+                      Navigator.of(context).pushReplacementNamed('/');
+                      Provider.of<Auth>(context, listen: false).logout();
+                    },
+                    child: Row(
+                      children: <Widget>[
+                        SizedBox(
+                          width: 20,
+                        ),
+                        Icon(
+                          Icons.exit_to_app,
+                          size: 25,
+                          color: Colors.white,
+                        ),
+                        SizedBox(
+                          width: 20,
+                        ),
+                        Text(
+                          "Logout",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
