@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:test_dasd/widgets/notification.dart';
 
 import '../screens/tab_screen.dart';
 import '../my_icons_icons.dart';
@@ -29,6 +30,7 @@ class _AddScreenState extends State<AddScreen> {
     title: '',
     amount: 0.25,
     time: '',
+    interval: 1,
     icon: Icon(
       _icon,
     ),
@@ -45,22 +47,7 @@ class _AddScreenState extends State<AddScreen> {
   String selectedUnit = 'tablet(s)';
   int days;
   String daysTitle = 'Number of days';
-  // static List<IconData> icons = [
-  //   MyIcons.color_pill,
-  //   MyIcons.drugs,
-  //   MyIcons.circle,
-  //   MyIcons.oval,
-  //   MyIcons.water,
-  //   MyIcons.pill_vertical,
-  //   MyIcons.vaccine,
-  //   MyIcons.inhaler,
-  //   MyIcons.eye_dropper,
-  //   MyIcons.spray,
-  //   MyIcons.spoon,
-  //   MyIcons.medicine_bottle,
 
-  //   // all the icons you want to include
-  // ];
   Function onpressed(String title) {
     return (newValue) => setState(() => {
           _groupValue = newValue,
@@ -70,6 +57,7 @@ class _AddScreenState extends State<AddScreen> {
               title: _editedMedicine.title,
               amount: _editedMedicine.amount,
               time: _editedMedicine.time,
+              interval: _editedMedicine.interval,
               icon: _editedMedicine.icon,
               color: _editedMedicine.color,
               date: _editedMedicine.date,
@@ -102,8 +90,8 @@ class _AddScreenState extends State<AddScreen> {
   var inIt = true;
   List<bool> isSelected;
   var _isLoading = false;
-  FlutterLocalNotificationsPlugin localNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+  // FlutterLocalNotificationsPlugin localNotificationsPlugin =
+  //     FlutterLocalNotificationsPlugin();
 
   var _unit = [
     'tablet(s)',
@@ -135,6 +123,7 @@ class _AddScreenState extends State<AddScreen> {
               title: _editedMedicine.title,
               amount: _editedMedicine.amount,
               time: time.toString(),
+              interval: _editedMedicine.interval,
               icon: _editedMedicine.icon,
               color: _editedMedicine.color,
               date: _editedMedicine.date,
@@ -167,6 +156,8 @@ class _AddScreenState extends State<AddScreen> {
       title: _editedMedicine.title,
       amount: _editedMedicine.id != null ? _editedMedicine.amount : dose,
       time: _time.format(context),
+      interval:
+          _editedMedicine.interval == 0 ? _editedMedicine.interval : _selected,
       icon: Icon(
         _icon,
         color: _iconColor,
@@ -267,6 +258,7 @@ class _AddScreenState extends State<AddScreen> {
               amount:
                   _editedMedicine.id != null ? _editedMedicine.amount : dose,
               time: _time.format(context),
+              interval: _editedMedicine.interval,
               icon: Icon(
                 _icon,
                 color: _iconColor,
@@ -306,7 +298,7 @@ class _AddScreenState extends State<AddScreen> {
       false,
       false,
     ];
-    initializeNotifications();
+    ini();
   }
 
   @override
@@ -348,7 +340,11 @@ class _AddScreenState extends State<AddScreen> {
                     ),
                     onPressed: () async {
                       _save(context);
-                      notification();
+                      noti(
+                        _editedMedicine.amount.toString(),
+                        _editedMedicine.type,
+                        _editedMedicine.title,
+                      );
                     }),
               )
             ],
@@ -385,6 +381,7 @@ class _AddScreenState extends State<AddScreen> {
                                       title: value,
                                       amount: _editedMedicine.amount,
                                       time: _editedMedicine.time,
+                                      interval: _editedMedicine.interval,
                                       icon: _editedMedicine.icon,
                                       color: _editedMedicine.color,
                                       date: _editedMedicine.date,
@@ -465,6 +462,8 @@ class _AddScreenState extends State<AddScreen> {
                                                   amount:
                                                       _editedMedicine.amount,
                                                   time: _editedMedicine.time,
+                                                  interval:
+                                                      _editedMedicine.interval,
                                                   icon: _editedMedicine.icon,
                                                   color: _editedMedicine.color,
                                                   date: _editedMedicine.date,
@@ -544,30 +543,6 @@ class _AddScreenState extends State<AddScreen> {
                                               ),
                                             ],
                                           ),
-                                          // Row(
-                                          //   mainAxisAlignment:
-                                          //       MainAxisAlignment.spaceBetween,
-                                          //   children: <Widget>[
-                                          //     Text(
-                                          //       'Frequency:',
-                                          //       style:
-                                          //           textStyle(Colors.black54),
-                                          //     ),
-                                          //     Container(
-                                          //       child: dropDown(
-                                          //         _frequecies,
-                                          //         color,
-                                          //         _freqencyItemSelected,
-                                          //         (String newValue) {
-                                          //           setState(() {
-                                          //             this._freqencyItemSelected =
-                                          //                 newValue;
-                                          //           });
-                                          //         },
-                                          //       ),
-                                          //     )
-                                          //   ],
-                                          // ),
                                         ],
                                       ),
                                     ),
@@ -876,7 +851,11 @@ class _AddScreenState extends State<AddScreen> {
                                   color: Theme.of(context).accentColor,
                                   onPressed: () {
                                     _save(context);
-                                    notification();
+                                    noti(
+                                      _editedMedicine.amount.toString(),
+                                      _editedMedicine.type,
+                                      _editedMedicine.title,
+                                    );
                                   },
                                   child: Text(
                                     'Done',
@@ -892,118 +871,23 @@ class _AddScreenState extends State<AddScreen> {
                   ),
                 ),
           floatingActionButton: FloatingActionButton(
-            onPressed: () => notification(),
-            child: Icon(Icons.notifications_paused),
-          ),
+              child: Icon(Icons.add),
+              onPressed: () => noti(
+                    _editedMedicine.amount.toString(),
+                    _editedMedicine.type,
+                    _editedMedicine.title,
+                  )),
         ),
       ),
     );
   }
 
-/////////////////////////////////// NOTIFICATION////////////////////////////////////////////////////////
-  // initializeNotification() async {
-  //   var initiallizeAndroid = AndroidInitializationSettings('ic_launcher');
-  //   var initiallizeIOS = IOSInitializationSettings();
-  //   var initSettings =
-  //       InitializationSettings(initiallizeAndroid, initiallizeIOS);
-  //   await localNotificationsPlugin.initialize(initSettings);
-  // }
-
-  // Future<void> notification() async {
-  //   String hour = _time.hour.toString();
-  //   String min = _time.minute.toString().length == 2
-  //       ? _time.minute.toString()
-  //       : '0${_time.minute.toString()}';
-  //   var time = Time(_time.hour, _time.minute, 0);
-
-  //   DateTime now = DateTime.parse("$date $hour:$min:00");
-  //   //DateTime.now().toUtc().add(Duration(seconds: 5));
-  //   await singleNotification(
-  //     localNotificationsPlugin,
-  //     now,
-  //     " It's time to take your medicine",
-  //     'Please Take ${_editedMedicine.amount} ${_editedMedicine.type} of ${_editedMedicine.title}',
-  //     int.parse((_time.hour.toString() + _time.minute.toString())),
-  //     _time.format(context),
-  //     time,
-  //   );
-  // }
-
-  // Future singleNotification(
-  //   FlutterLocalNotificationsPlugin plugin,
-  //   DateTime date,
-  //   String message,
-  //   String subText,
-  //   int hashcode,
-  //   String channelId,
-  //   Time time,
-  // ) async {
-  //   var androidChannel = AndroidNotificationDetails(
-  //     channelId,
-  //     'chanel-name',
-  //     'chanel-description',
-  //     // sound: 'sound',
-  //     importance: Importance.Max,
-  //     priority: Priority.Max,
-  //   );
-
-  //   var iosChannel = IOSNotificationDetails();
-  //   var platformChannel = NotificationDetails(androidChannel, iosChannel);
-  //   plugin.showDailyAtTime(hashcode, message, subText, time, platformChannel);
-  //   // schedule(hashcode, message, subText, date, platformChannel,
-  //   //     payload: hashCode.toString());
-  // }
-  initializeNotifications() async {
-    var initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/launcher_icon');
-    var initializationSettingsIOS = IOSInitializationSettings();
-    var initializationSettings = InitializationSettings(
-        initializationSettingsAndroid, initializationSettingsIOS);
-    await localNotificationsPlugin.initialize(
-      initializationSettings,
-    );
+  void ini() {
+    initializeNotification();
   }
 
-  Future<void> notification() async {
-    var hour = _time.hour;
-    var minute = _time.minute;
-
-    // var hour = int.parse(medicine.startTime[0] + medicine.startTime[1]);
-    var ogValue = hour;
-    // var minute = int.parse(medicine.startTime[2] + medicine.startTime[3]);
-    // print("object");
-    // print(medicine.startTime[0] + medicine.startTime[1]);
-    // print(medicine.startTime[2] + medicine.startTime[3]);
-
-    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-      'repeatDailyAtTime channel id',
-      'repeatDailyAtTime channel name',
-      'repeatDailyAtTime description',
-      importance: Importance.Max,
-      ledColor: Color(0xFF3EB16F),
-      ledOffMs: 1000,
-      ledOnMs: 1000,
-      enableLights: true,
-    );
-    var iOSPlatformChannelSpecifics = IOSNotificationDetails();
-    var platformChannelSpecifics = NotificationDetails(
-        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
-
-    // for (int i = 0; i < (24 / medicine.interval).floor(); i++) {
-    //   if ((hour + (medicine.interval * i) > 23)) {
-    //     hour = hour + (medicine.interval * i) - 24;
-    //   } else {
-    //     hour = hour + (medicine.interval * i);
-    //   }
-    await localNotificationsPlugin.showDailyAtTime(
-      hour,
-      'Mediminder:medicine.title}',
-      'It is time to take your medicine, according to schedule',
-      Time(hour, minute, 0),
-      platformChannelSpecifics,
-    );
-    hour = ogValue;
+  void noti(String amount, String type, String title) {
+    notifications(context, _time, 'Please Take $amount $type of $title', false,
+        _selected, 1);
   }
-  //await flutterLocalNotificationsPlugin.cancelAll();
-
 }

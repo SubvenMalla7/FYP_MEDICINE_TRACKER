@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
-
 import '../model/auth.dart';
 import '../my_icons_icons.dart';
 import '../screens/user_profile.dart';
@@ -19,13 +18,14 @@ class AppDrawer extends StatelessWidget {
       return TextStyle(
           color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold);
     }
-final screenSize=MediaQuery.of(context).size;
+
+    final screenSize = MediaQuery.of(context).size;
     final userdata = Provider.of<Auth>(context);
     return Container(
       padding: const EdgeInsets.only(top: 35),
       //height: 740,
-      height: screenSize.height*0.88,
-      width: screenSize.width*0.5,
+      height: screenSize.height * 0.88,
+      width: screenSize.width * 0.5,
       child: ClipRRect(
         borderRadius: BorderRadius.horizontal(right: Radius.circular(30)),
         child: Drawer(
@@ -34,8 +34,24 @@ final screenSize=MediaQuery.of(context).size;
             child: Column(
               children: <Widget>[
                 GestureDetector(
-                  onTap: () =>
-                      Navigator.of(context).pushNamed(UserProfile.routeName),
+                  onTap: () => Navigator.of(context).push(
+                    PageRouteBuilder<Null>(
+                      pageBuilder: (BuildContext context,
+                          Animation<double> animation,
+                          Animation<double> secondaryAnimation) {
+                        return AnimatedBuilder(
+                            animation: animation,
+                            builder: (BuildContext context, Widget child) {
+                              return Opacity(
+                                opacity: animation.value,
+                                child: UserProfile(),
+                              );
+                            });
+                      },
+                      transitionDuration: Duration(milliseconds: 500),
+                    ),
+                  ),
+                  // Navigator.of(context).pushNamed(UserProfile.routeName),
                   child: Container(
                     color: Theme.of(context).primaryColor,
                     child: Padding(
@@ -51,10 +67,13 @@ final screenSize=MediaQuery.of(context).size;
                               Container(
                                 height: 70,
                                 width: 70,
-                                child: CircleAvatar(
-                                  child: Icon(
-                                    Icons.person,
-                                    size: 40,
+                                child: Hero(
+                                  tag: userdata.userId,
+                                  child: CircleAvatar(
+                                    child: Icon(
+                                      Icons.person,
+                                      size: 40,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -62,11 +81,11 @@ final screenSize=MediaQuery.of(context).size;
                                 height: 20,
                               ),
                               Text(
-                                userdata.name,
+                                userdata.name == null ? '' : userdata.name,
                                 style: textStyle(),
                               ),
                               Text(
-                                userdata.email,
+                                userdata.email == null ? '' : userdata.email,
                                 style: textStyle(),
                               ),
                             ],

@@ -21,6 +21,7 @@ class UserMedicines extends StatelessWidget {
         shadowColor: Theme.of(context).primaryColor,
         shape: StadiumBorder(),
         child: Container(
+          width: MediaQuery.of(context).size.width,
           alignment: Alignment.center,
           height: MediaQuery.of(context).size.height * 0.1,
           child: ListTile(

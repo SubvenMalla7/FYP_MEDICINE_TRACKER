@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:test_dasd/model/auth.dart';
 import 'package:test_dasd/screens/measurements.dart';
 import 'package:test_dasd/screens/splash_screen.dart';
 
@@ -36,23 +37,10 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
     super.didChangeDependencies();
   }
 
-  // Widget appBar() {
-  //   return Container(
-  //     child: Container(
-
-  //       alignment: Alignment.centerLeft,
-  //       height: 100,
-  //       width: 300,
-  //       decoration: BoxDecoration(),
-  //       // margin: const EdgeInsets.only(top: 10, left: 5, right: 5),
-  //       child: Calender(),
-  //     ),
-  //   );
-  // }
-
   @override
   Widget build(BuildContext context) {
     final medicine = Provider.of<Medicines>(context);
+    final user = Provider.of<Auth>(context);
     final screenSize = MediaQuery.of(context).size;
     final colors = Theme.of(context).primaryColor;
     final color = Theme.of(context).accentColor;
@@ -60,6 +48,8 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
     return _isLoading
         ? SplashScreen()
         : Scaffold(
+            drawerEnableOpenDragGesture: true,
+            drawerEdgeDragWidth: double.infinity,
             drawer: AppDrawer(),
             floatingActionButton: SpeedDial(
               animatedIcon: AnimatedIcons.menu_close,
@@ -90,7 +80,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                 SliverAppBar(
                   forceElevated: true,
                   backgroundColor: colors,
-                  expandedHeight: screenSize.height * 0.40,
+                  expandedHeight: screenSize.height * 0.45,
                   pinned: true,
                   flexibleSpace: FlexibleSpaceBar(
                     background: Container(
@@ -123,7 +113,9 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                             child: Padding(
                               padding: const EdgeInsets.only(left: 25.0),
                               child: Text(
-                                'HI Admin',
+                                user.name == null
+                                    ? 'Hello'
+                                    : 'Hello ${user.name}',
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 30,
@@ -159,18 +151,26 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                     )
                   ],
                 ),
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, i) => Container(
-                      padding: const EdgeInsets.all(10),
-                      child: ChangeNotifierProvider.value(
-                        value: medicine.items[i],
-                        child: MedicineScedule(),
+                medicine.items.length == 0
+                    ? SliverFillRemaining(
+                        child: Container(
+                          child: Center(
+                            child: Text('Add your Medicine to get notify'),
+                          ),
+                        ),
+                      )
+                    : SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, i) => Container(
+                            padding: const EdgeInsets.all(10),
+                            child: ChangeNotifierProvider.value(
+                              value: medicine.items[i],
+                              child: MedicineScedule(),
+                            ),
+                          ),
+                          childCount: medicine.items.length,
+                        ),
                       ),
-                    ),
-                    childCount: medicine.items.length,
-                  ),
-                ),
               ],
             ),
           );

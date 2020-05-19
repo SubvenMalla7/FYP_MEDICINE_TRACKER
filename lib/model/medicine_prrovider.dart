@@ -1,10 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import '../my_icons_icons.dart';
-
 import 'package:http/http.dart' as http;
 
+import '../my_icons_icons.dart';
 import './Medicine.dart';
 import './http_exception.dart';
 import 'MedicineLog.dart';
@@ -36,11 +35,11 @@ class Medicines with ChangeNotifier {
   }
 
   Future<void> fetchAndSetMeds() async {
-    // final url = 'http://10.0.2.2:8000/api/medicine?api_token=$authtoken';
     final url = 'http://192.168.0.103:8000/api/medicine?api_token=$authtoken';
     try {
       final response = await http.get(url, headers: headers);
       final extractedData = json.decode(response.body);
+      print(extractedData);
 
       final List<Medicine> loadedMedicine = [];
       var data = extractedData;
@@ -112,13 +111,14 @@ class Medicines with ChangeNotifier {
         if (MyIcons.medicine_bottle.codePoint == int.parse(medData['icon'])) {
           icon = MyIcons.medicine_bottle;
         }
-
+        print("object");
         loadedMedicine.add(
           Medicine(
               id: medData['id'].toString(),
               title: medData['title'],
               amount: double.parse(medData['amount']),
               time: medData['time'],
+              interval: medData['intervals'],
               icon: Icon(
                 icon,
                 size: 30,
@@ -130,6 +130,7 @@ class Medicines with ChangeNotifier {
               note: medData['note'],
               type: medData['type']),
         );
+        print('sdasdas${medData['id']}');
       });
 
       _items = loadedMedicine;
@@ -142,6 +143,7 @@ class Medicines with ChangeNotifier {
 
   Future<void> addMedicines(Medicine medicine) async {
     final url = 'http://192.168.0.103:8000/api/medicine?api_token=$authtoken';
+    print(url);
 
     final response = await http.post(
       url,
@@ -150,6 +152,7 @@ class Medicines with ChangeNotifier {
         'title': medicine.title,
         'amount': medicine.amount,
         'time': medicine.time,
+        'intervals': medicine.interval,
         'start_date': medicine.date,
         'icon': medicine.icon.icon.codePoint.toString(),
         'color': medicine.color.toString(),
@@ -159,12 +162,14 @@ class Medicines with ChangeNotifier {
         'note': medicine.note,
       }),
     );
+    print(response.body);
 
     final newMedicine = Medicine(
       id: json.decode(response.body)['data']['id'].toString(),
       title: medicine.title,
       amount: medicine.amount,
       time: medicine.time,
+      interval: medicine.interval,
       icon: medicine.icon,
       color: medicine.color,
       date: medicine.date,
@@ -174,6 +179,7 @@ class Medicines with ChangeNotifier {
     );
 
     _items.add(newMedicine);
+
     notifyListeners();
   }
 

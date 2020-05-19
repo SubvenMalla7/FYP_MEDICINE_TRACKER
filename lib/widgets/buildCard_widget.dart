@@ -204,3 +204,14 @@ Widget myRadioButton2(
     ),
   );
 }
+
+Widget option(BuildContext context, Widget child) {
+  return Container(
+    color: Colors.white,
+    height: MediaQuery.of(context).size.height * 0.35,
+    child: Padding(
+      padding: const EdgeInsets.all(10),
+      child: child,
+    ),
+  );
+}

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
-import 'package:test_dasd/widgets/animation.dart';
+import 'package:test_dasd/widgets/buildCard_widget.dart';
 
+import '../widgets/animation.dart';
+import '../widgets/notification.dart';
 import '../model/medicine_prrovider.dart';
 import '../model/Medicine.dart';
 import '../model/MedicineLog.dart';
@@ -14,12 +15,11 @@ class MedicineScedule extends StatefulWidget {
 
 class _MedicineSceduleState extends State<MedicineScedule> {
   var status;
-  var time;
+  TimeOfDay time = TimeOfDay.now();
   String reasons = '-';
   var color = Colors.red;
   String text = 'Not Taken';
-  FlutterLocalNotificationsPlugin localNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+
   var _medicineLog = MedicineLog(
     title: '',
     amount: 0.25,
@@ -29,38 +29,15 @@ class _MedicineSceduleState extends State<MedicineScedule> {
     reasons: '',
   );
 
-  initializeNotification() async {
-    var initiallizeAndroid = AndroidInitializationSettings('ic_launcher');
-    var initiallizeIOS = IOSInitializationSettings();
-    var initSettings =
-        InitializationSettings(initiallizeAndroid, initiallizeIOS);
-    await localNotificationsPlugin.initialize(initSettings);
-  }
-
-  Future singleNotification(
-    FlutterLocalNotificationsPlugin plugin,
-    DateTime date,
-    String message,
-    String subText,
-    int hashcode,
-    String channelId,
-  ) async {
-    var androidChannel = AndroidNotificationDetails(
-      channelId,
-      'chanel-name',
-      'chanel-description',
-      importance: Importance.Max,
-      priority: Priority.Max,
+  void notification(String amount, String type, int min, String title) {
+    notifications(
+      context,
+      TimeOfDay.now(),
+      'Please Take $amount $type of $title',
+      true,
+      0,
+      min,
     );
-    print('Channel-Id $hashcode');
-    var iosChannel = IOSNotificationDetails();
-    var platformChannel = NotificationDetails(androidChannel, iosChannel);
-    plugin
-        .
-        // periodicallyShow(
-        //     hashcode, message, subText, interval, platformChannel);
-        schedule(hashcode, message, subText, date, platformChannel,
-            payload: hashCode.toString());
   }
 
   Future<void> _save(BuildContext context) async {
@@ -129,263 +106,205 @@ class _MedicineSceduleState extends State<MedicineScedule> {
     Navigator.of(context).pop();
   }
 
-  Future<void> notification(
-      String amount, String title, int min, String type) async {
-    DateTime now = DateTime.now().toUtc().add(Duration(seconds: min));
+  Widget button(String title, double amount, String time, String statuss,
+      String message) {
+    return FlatButton(
+      color: Theme.of(context).primaryColor,
+      shape: StadiumBorder(),
+      onPressed: () {
+        setState(() => reasons = message);
+        print(reasons);
+        _medicineLog = MedicineLog(
+          title: title,
+          amount: amount,
+          time: time,
+          date: DateTime.now().toString(),
+          status: statuss,
+          reasons: statuss == 'Taken' ? '-' : reasons,
+        );
+        _save(context);
 
-    await singleNotification(
-      localNotificationsPlugin,
-      now,
-      " It's time to take your medicine",
-      'Please Take $amount $type of $title',
-      int.parse((time.hour.toString() + time.minute.toString())),
-      time.format(context),
+        Navigator.of(context).pop();
+      },
+      child: Text(
+        message,
+        style: textStyle(Colors.white),
+      ),
     );
+  }
+
+  Widget snoozeButton(
+    String amount,
+    String type,
+    int min,
+    String title,
+    String message,
+  ) {
+    return FlatButton(
+      shape: StadiumBorder(),
+      color: Theme.of(context).primaryColor,
+      onPressed: () {
+        notification(amount, type, min, title);
+        Navigator.of(context).pop();
+      },
+      child: Text(
+        message,
+        style: textStyle(Colors.white),
+      ),
+    );
+  }
+
+  void ini() {
+    initializeNotification();
+  }
+
+  @override
+  void initState() {
+    ini();
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     Color colors = Theme.of(context).primaryColor;
     final medicine = Provider.of<Medicine>(context);
+    final screenSize = MediaQuery.of(context).size;
     var time = TimeOfDay.now();
-    int min;
-    print('this is medicine color ${medicine.title}');
+
+    Widget sized() {
+      return SizedBox(height: screenSize.height * 0.01);
+    }
 
     Widget taken() {
-      return Container(
-        color: Theme.of(context).primaryColor,
-        height: 280,
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Column(
-            children: <Widget>[
-              Align(
-                alignment: Alignment.center,
-                child: Text(
-                  'When did you take your medicine?',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                      color: Theme.of(context).accentColor),
-                ),
+      return option(
+        context,
+        Column(
+          children: <Widget>[
+            Align(
+              alignment: Alignment.center,
+              child: Text(
+                'When did you take your medicine?',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: Theme.of(context).accentColor),
               ),
-              SizedBox(
-                height: 10,
+            ),
+            sized(),
+            sized(),
+            sized(),
+            button(medicine.title, medicine.amount, medicine.time, 'Taken',
+                'On Time: (${medicine.time})'),
+            sized(),
+            button(medicine.title, medicine.amount, time.format(context),
+                'Taken', 'Now (${time.format(context)})'),
+            sized(),
+            FlatButton(
+              shape: StadiumBorder(),
+              color: Theme.of(context).primaryColor,
+              onPressed: () => _selectTime(
+                context,
+                medicine.title,
+                medicine.amount,
               ),
-              FlatButton(
-                  textColor: Colors.white,
-                  onPressed: () {
-                    _medicineLog = MedicineLog(
-                      title: medicine.title,
-                      amount: medicine.amount,
-                      time: medicine.time,
-                      date: DateTime.now().toString(),
-                      status: 'Taken',
-                      reasons: reasons,
-                    );
-                    _save(context);
-                    setState(() {
-                      text = 'Taken at ${medicine.time}';
-                    });
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('On Time: (${medicine.time})')),
-              SizedBox(
-                height: 10,
+              child: Text(
+                'Pick Specific Time',
+                style: textStyle(Colors.white),
               ),
-              FlatButton(
-                onPressed: () {
-                  _medicineLog = MedicineLog(
-                    title: medicine.title,
-                    amount: medicine.amount,
-                    time: time.format(context),
-                    date: DateTime.now().toString(),
-                    status: 'Taken',
-                    reasons: reasons,
-                  );
-                  _save(context);
-
-                  setState(() {
-                    text = 'Taken at ${time.format(context)}';
-                  });
-                  Navigator.of(context).pop();
-                },
-                child: Text('Now (${time.format(context)})'),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              FlatButton(
-                onPressed: () => _selectTime(
-                  context,
-                  medicine.title,
-                  medicine.amount,
-                ),
-                child: Text('Pick Specific Time'),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       );
     }
 
     Widget snoozed() {
-      return Container(
-        height: 280,
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Column(
-            children: <Widget>[
-              Align(
-                alignment: Alignment.center,
-                child: Text(
-                  'Snooze For?',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                ),
+      return option(
+        context,
+        Column(
+          children: <Widget>[
+            Align(
+              alignment: Alignment.center,
+              child: Text(
+                'Snooze For?',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: Theme.of(context).accentColor),
               ),
-              SizedBox(
-                height: 10,
-              ),
-              FlatButton(
-                onPressed: () {
-                  setState(() {
-                    min = 5;
-                  });
-                  notification(medicine.amount.toString(), medicine.type, min,
-                      medicine.title);
-                  Navigator.of(context).pop();
-                },
-                child: Text('5 Minutes from ${time.format(context)}'),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              FlatButton(
-                onPressed: () {
-                  setState(() {
-                    min = 10;
-                  });
-                  notification(medicine.amount.toString(), medicine.type, min,
-                      medicine.title);
-                  Navigator.of(context).pop();
-                },
-                child: Text('10 Minutes from ${time.format(context)}'),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              FlatButton(
-                onPressed: () {
-                  setState(() {
-                    min = 30;
-                  });
-                  notification(medicine.amount.toString(), medicine.type, min,
-                      medicine.title);
-                  Navigator.of(context).pop();
-                },
-                child: Text('30 Minutes from ${time.format(context)}'),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              FlatButton(
-                onPressed: () {
-                  setState(() {
-                    min = 60;
-                  });
-                  notification(medicine.amount.toString(), medicine.type, min,
-                      medicine.title);
-                  Navigator.of(context).pop();
-                },
-                child: Text('1 hr from ${time.format(context)}'),
-              ),
-            ],
-          ),
+            ),
+            sized(),
+            sized(),
+            snoozeButton(
+              medicine.amount.toString(),
+              medicine.type,
+              5,
+              medicine.title,
+              '5 Minutes from ${time.format(context)}',
+            ),
+            sized(),
+            snoozeButton(
+              medicine.amount.toString(),
+              medicine.type,
+              10,
+              medicine.title,
+              '10 Minutes from ${time.format(context)}',
+            ),
+            sized(),
+            snoozeButton(
+              medicine.amount.toString(),
+              medicine.type,
+              30,
+              medicine.title,
+              '30 Minutes from ${time.format(context)}',
+            ),
+            sized(),
+            snoozeButton(
+              medicine.amount.toString(),
+              medicine.type,
+              60,
+              medicine.title,
+              '1 hour from ${time.format(context)}',
+            ),
+            sized(),
+          ],
         ),
       );
     }
 
     Widget skipped() {
-      return Container(
-        height: 280,
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Column(
-            children: <Widget>[
-              Align(
-                alignment: Alignment.center,
-                child: Text(
-                  'When did you take your medicine?',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                ),
+      return option(
+        context,
+        Column(
+          children: <Widget>[
+            Align(
+              alignment: Alignment.center,
+              child: Text(
+                'When did you take your medicine?',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: Theme.of(context).accentColor),
               ),
-              SizedBox(
-                height: 10,
-              ),
-              FlatButton(
-                onPressed: () {
-                  setState(() {
-                    reasons = "Medicine isn't near me";
-                  });
-                  _medicineLog = MedicineLog(
-                    title: medicine.title,
-                    amount: medicine.amount,
-                    time: medicine.time,
-                    date: DateTime.now().toString(),
-                    status: 'Skipped',
-                    reasons: reasons,
-                  );
-                  _save(context);
-                  Navigator.of(context).pop();
-                },
-                child: Text("Medicine isn't near me"),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              FlatButton(
-                onPressed: () {
-                  setState(() {
-                    reasons = "Forgot/ busy/Asleep";
-                  });
-                  _medicineLog = MedicineLog(
-                    title: medicine.title,
-                    amount: medicine.amount,
-                    time: time.format(context),
-                    date: DateTime.now().toString(),
-                    status: 'Skipped',
-                    reasons: reasons,
-                  );
-                  _save(context);
-                  Navigator.of(context).pop();
-                },
-                child: Text('Forgot/ busy/Asleep'),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              FlatButton(
-                onPressed: () {
-                  setState(() {
-                    reasons = "Ran out of the medicine";
-                  });
-                  _medicineLog = MedicineLog(
-                    title: medicine.title,
-                    amount: medicine.amount,
-                    time: time.format(context),
-                    date: DateTime.now().toString(),
-                    status: 'Skipped',
-                    reasons: reasons,
-                  );
-                  _save(context);
-                  Navigator.of(context).pop();
-                },
-                child: Text('Ran out of the medicine'),
-              ),
-            ],
-          ),
+            ),
+            sized(),
+            sized(),
+            sized(),
+            button(medicine.title, medicine.amount, medicine.time, 'Skipped',
+                "Medicine isn't near me"),
+            sized(),
+            button(medicine.title, medicine.amount, medicine.time, 'Skipped',
+                "Forgot/ busy/Asleep"),
+            sized(),
+            button(medicine.title, medicine.amount, medicine.time, 'Skipped',
+                "Ran out of the medicine"),
+            sized(),
+          ],
         ),
       );
+    }
+
+    TextStyle cardText() {
+      return TextStyle(fontWeight: FontWeight.w300, fontSize: 15);
     }
 
     Future<void> _action(BuildContext ctx) {
@@ -426,7 +345,7 @@ class _MedicineSceduleState extends State<MedicineScedule> {
                     ],
                   ),
                 ),
-                height: 50,
+                height: screenSize.height * 0.07,
                 child: Center(
                     child: Text(
                   medicine.time,
@@ -458,20 +377,25 @@ class _MedicineSceduleState extends State<MedicineScedule> {
                       child: Text(
                         medicine.title,
                         style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 20),
+                            color: Theme.of(context).primaryColor,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20),
                       ),
                     ),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        Text('Take ${medicine.amount.toString()}'),
-                        Text(text, style: TextStyle(color: color))
+                        Text(
+                            'Take ${medicine.amount.toString()} ${medicine.type}',
+                            style: cardText()),
+                        Text(medicine.instruction, style: cardText()),
+                        Text(text, style: TextStyle(color: color)),
                       ],
                     ),
                   ),
                   children: <Widget>[
                     Container(
-                      height: 100,
+                      height: screenSize.height * 0.12,
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Container(

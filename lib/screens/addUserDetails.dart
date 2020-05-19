@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:test_dasd/screens/tab_screen.dart';
 
 import '../model/User.dart';
 import '../widgets/buildCard_widget.dart';
@@ -60,18 +61,12 @@ class _AddUserDetailsState extends State<AddUserDetails> {
             alert(context, 'An Error Occurred', 'Please try again!'),
       );
     }
-    // finally {
-    //   setState(() {
-    //     _isLoading = false;
-    //   });
-    //   Navigator.of(context).pop();
-    // }
 
     setState(() {
       _isLoading = true;
     });
 
-    Navigator.of(context).pop();
+    Navigator.of(context).popAndPushNamed(TabsScreen.routeName);
   }
 
   @override
@@ -180,7 +175,10 @@ class _AddUserDetailsState extends State<AddUserDetails> {
                                           Container(
                                             width: 120,
                                             child: buildForm(
-                                                _editedData.age.toString(),
+                                                _editedData.age == null
+                                                    ? ''
+                                                    : _editedData.age
+                                                        .toString(),
                                                 'Age',
                                                 'Please enter your Age.',
                                                 TextInputType.number,

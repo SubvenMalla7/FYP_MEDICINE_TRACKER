@@ -5,6 +5,7 @@ class Medicine with ChangeNotifier {
   final String title;
   double amount;
   final String time;
+  final int interval;
   final String date;
   final String type;
   final String instruction;
@@ -17,6 +18,7 @@ class Medicine with ChangeNotifier {
     @required this.title,
     @required this.amount,
     @required this.time,
+    @required this.interval,
     @required this.icon,
     @required this.color,
     @required this.date,

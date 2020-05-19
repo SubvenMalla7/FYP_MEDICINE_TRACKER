@@ -10,9 +10,13 @@ import './add_screen.dart';
 class SingleMedicine extends StatelessWidget {
   static const routeName = '/medicine';
 
+  final Medicine medicine;
+
+  SingleMedicine({this.medicine});
+
   @override
   Widget build(BuildContext context) {
-    final Medicine medicine = ModalRoute.of(context).settings.arguments;
+    //final Medicine medicine = ModalRoute.of(context).settings.arguments;
     // var date = DateFormat('yyyy-mm-dd').format(DateTime.now());
 
     return Scaffold(
@@ -54,9 +58,12 @@ class SingleMedicine extends StatelessWidget {
                             children: <Widget>[
                               Material(
                                 color: Colors.transparent,
-                                child: MainTabInfo(
-                                  fieldTitle: "Medicine Name",
-                                  fieldInfo: medicine.title,
+                                child: Hero(
+                                  tag: medicine.id,
+                                  child: MainTabInfo(
+                                    fieldTitle: "Medicine Name",
+                                    fieldInfo: medicine.title,
+                                  ),
                                 ),
                               ),
                               MainTabInfo(
