@@ -47,6 +47,7 @@ class _UserProfileState extends State<UserProfile> {
                           onPressed: () => Navigator.of(context).pop(),
                         ),
                         IconButton(
+                          key: Key('userDelete'),
                           icon: Icon(
                             Icons.delete,
                             size: 30,
@@ -80,7 +81,7 @@ class _UserProfileState extends State<UserProfile> {
                     height: screenSize.height * 0.183,
                   ),
                   Container(
-                    height: screenSize.height * 0.67,
+                    height: screenSize.height * 0.665,
                     width: double.infinity,
                     alignment: Alignment.topCenter,
                     decoration: BoxDecoration(
@@ -93,6 +94,7 @@ class _UserProfileState extends State<UserProfile> {
                         Padding(
                           padding: const EdgeInsets.only(left: 300, top: 10),
                           child: IconButton(
+                            key: Key('userEdit'),
                             icon: Icon(
                               Icons.edit,
                               size: 30,
@@ -104,7 +106,7 @@ class _UserProfileState extends State<UserProfile> {
                           ),
                         ),
                         SizedBox(
-                          height: screenSize.height * 0.03,
+                          height: screenSize.height * 0.02,
                         ),
                         Text(
                           userData.name,
@@ -135,7 +137,7 @@ class _UserProfileState extends State<UserProfile> {
                                         : userData.gender,
                                   ),
                                   SizedBox(
-                                    width: 160,
+                                    width: screenSize.width * 0.20,
                                   ),
                                   ExtendedInfoTab(
                                     fieldTitle: "Age ",

@@ -75,7 +75,7 @@ class _MeasurementState extends State<Measurement> {
     Navigator.of(context).pop();
   }
 
-  Future _showdoubleDialog(String unit1, String unit2, id) async {
+  Future _showdoubleDialog(String key, String unit1, String unit2, id) async {
     await showDialog<int>(
         context: context,
         builder: (BuildContext context) {
@@ -85,6 +85,7 @@ class _MeasurementState extends State<Measurement> {
                 Container(
                   width: 40,
                   child: TextField(
+                    key: Key(key),
                     controller: customController,
                     keyboardType: TextInputType.number,
                     textInputAction: TextInputAction.done,
@@ -151,6 +152,14 @@ class _MeasurementState extends State<Measurement> {
           maxValue: 200,
           step: 1,
           initialIntegerValue: 0,
+          confirmWidget: Text(
+            'Ok',
+            style: TextStyle(color: Theme.of(context).primaryColor),
+          ),
+          cancelWidget: Text(
+            'Cancel',
+            style: TextStyle(color: Theme.of(context).errorColor),
+          ),
         );
       },
     ).then((int value) async {
@@ -164,15 +173,15 @@ class _MeasurementState extends State<Measurement> {
     });
   }
 
-  Widget _button(id, String unit1, String unit2) {
+  Widget _button(String key, id, String unit1, String unit2) {
     return FlatButton(
-      key: Key(height),
+      key: Key(key),
       color: Theme.of(context).primaryColor,
       onPressed: () {
         id == 3
-            ? _showdoubleDialog(unit1, unit2, id)
+            ? _showdoubleDialog('height', unit1, unit2, id)
             : id == 4
-                ? _showdoubleDialog(unit1, unit2, id)
+                ? _showdoubleDialog('height', unit1, unit2, id)
                 : _showIntegerDialog(id);
       },
       child: Text(
@@ -241,6 +250,7 @@ class _MeasurementState extends State<Measurement> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
+          key: Key('mesurSave'),
             icon: Icon(Icons.arrow_back),
             onPressed: () async {
               final pref = await SharedPreferences.getInstance();
@@ -273,7 +283,7 @@ class _MeasurementState extends State<Measurement> {
                   FontAwesomeIcons.heartbeat,
                   color: Colors.red,
                 ),
-                _button(1, '', ''),
+                _button('heart', 1, '', ''),
               ),
               SizedBox(
                 height: 10,
@@ -286,7 +296,7 @@ class _MeasurementState extends State<Measurement> {
                   FontAwesomeIcons.weightHanging,
                   color: Colors.red,
                 ),
-                _button(2, '', ''),
+                _button('weight', 2, '', ''),
               ),
               SizedBox(
                 height: 10,
@@ -299,7 +309,7 @@ class _MeasurementState extends State<Measurement> {
                   MyIcons.ruler,
                   color: Colors.red,
                 ),
-                _button(3, 'feet', 'inches'),
+                _button('height', 3, 'feet', 'inches'),
               ),
               SizedBox(
                 height: 10,
@@ -317,6 +327,7 @@ class _MeasurementState extends State<Measurement> {
                     CircleAvatar(
                       backgroundColor: Theme.of(context).primaryColor,
                       child: IconButton(
+                        key: Key('minus'),
                         icon: Icon(
                           MdiIcons.minus,
                           color: Colors.white,
@@ -337,6 +348,7 @@ class _MeasurementState extends State<Measurement> {
                     CircleAvatar(
                       backgroundColor: Theme.of(context).primaryColor,
                       child: IconButton(
+                        key: Key('add'),
                         icon: Icon(
                           Icons.add,
                           color: Colors.white,
@@ -362,7 +374,7 @@ class _MeasurementState extends State<Measurement> {
                   FontAwesomeIcons.solidHeart,
                   color: Colors.red,
                 ),
-                _button(4, '/', ''),
+                _button('pressure', 4, '/', ''),
               ),
               SizedBox(
                 height: 10,
@@ -375,7 +387,7 @@ class _MeasurementState extends State<Measurement> {
                   FontAwesomeIcons.solidHeart,
                   color: Colors.red,
                 ),
-                _button(5, '', ''),
+                _button('sugar', 5, '', ''),
               ),
             ],
           ),

@@ -59,6 +59,7 @@ class _MapState extends State<Map> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: IconButton(
+                key: Key('call'),
                 icon: Icon(
                   FontAwesomeIcons.ambulance,
                   color: Theme.of(context).accentColor,
@@ -94,47 +95,47 @@ class _MapState extends State<Map> {
               SizedBox(width: 10.0),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: _boxes("assets/image/norvic.jfif", 27.6900, 85.3191,
-                    "Norvic Hospital"),
+                child: _boxes('map1', "assets/image/norvic.jfif", 27.6900,
+                    85.3191, "Norvic Hospital"),
               ),
               SizedBox(width: 10.0),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: _boxes("assets/image/birhospital.jpg", 27.7048, 85.3137,
+                child: _boxes('map2',"assets/image/birhospital.jpg", 27.7048, 85.3137,
                     "Bir Hospital"),
               ),
               SizedBox(width: 10.0),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: _boxes("assets/image/medicity.jfif", 27.662199,
+                child: _boxes('map3',"assets/image/medicity.jfif", 27.662199,
                     85.302915, "Nepal Mediciti Hospital"),
               ),
               SizedBox(width: 10.0),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: _boxes("assets/image/civil.jfif", 27.686579, 85.338750,
+                child: _boxes('map4',"assets/image/civil.jfif", 27.686579, 85.338750,
                     "Civil Hospital"),
               ),
               SizedBox(width: 10.0),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: _boxes("assets/image/alka_hospital.jfif", 27.674679,
+                child: _boxes('map5',"assets/image/alka_hospital.jfif", 27.674679,
                     85.315362, "Alka Hospital"),
               ),
               SizedBox(width: 10.0),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: _boxes("assets/image/civil.jfif", 27.693321, 85.314143,
+                child: _boxes('map6',"assets/image/civil.jfif", 27.693321, 85.314143,
                     "Nepal Eye Hospital"),
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: _boxes("assets/image/sumeru.jfif", 27.676175, 85.314776,
+                child: _boxes('map7',"assets/image/sumeru.jfif", 27.676175, 85.314776,
                     "Sumeru City Hospital"),
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: _boxes("assets/image/bluecross.jfif", 27.693806,
+                child: _boxes('map8',"assets/image/bluecross.jfif", 27.693806,
                     85.315231, "Blue Cross Hospital"),
               ),
             ],
@@ -219,7 +220,8 @@ class _MapState extends State<Map> {
     );
   }
 
-  Widget _boxes(String _image, double lat, double long, String restaurantName) {
+  Widget _boxes(String key, String _image, double lat, double long,
+      String restaurantName) {
     return GestureDetector(
       onTap: () {
         _gotoLocation(lat, long);
@@ -227,6 +229,7 @@ class _MapState extends State<Map> {
       child: Container(
         child: new FittedBox(
           child: Material(
+              key: Key(key),
               color: Colors.white,
               elevation: 14.0,
               borderRadius: BorderRadius.circular(24.0),

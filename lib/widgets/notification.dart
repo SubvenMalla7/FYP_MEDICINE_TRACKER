@@ -13,13 +13,13 @@ initializeNotification() async {
 
 Future<void> notifications(BuildContext context, TimeOfDay _time,
     String message, bool isSchedule, int interval, int min) async {
-  print(min);
-  print(_time);
-  print(interval);
-  print(int.parse((_time.hour.toString() + _time.minute.toString())));
+  // print(min);
+  // print(_time);
+  // print(interval);
+  // print(int.parse((_time.hour.toString() + _time.minute.toString())));
   var time = Time(_time.hour, _time.minute, 0);
 
-  DateTime now = DateTime.now().toUtc().add(Duration(minutes: min));
+  DateTime now = DateTime.now().toUtc().add(Duration(seconds: min));
 
   await singleNotification(
       localNotificationsPlugin,
@@ -54,15 +54,15 @@ Future singleNotification(
     importance: Importance.Max,
     priority: Priority.Max,
   );
-  print(hashcode);
-  print(isSchedule);
-  print(interval);
+  // print(hashcode);
+  // print(isSchedule);
+  // print(interval);
   int hour = _time.hour;
   var ogValue = hour;
   var iosChannel = IOSNotificationDetails();
   var platformChannel = NotificationDetails(androidChannel, iosChannel);
   if (isSchedule) {
-    print('Schedule');
+    // print('Schedule');
 
     await plugin.schedule(
       hashcode,
@@ -72,7 +72,7 @@ Future singleNotification(
       platformChannel,
     );
   } else {
-    print('Interval:$interval');
+    // print('Interval:$interval');
     for (int i = 0; i < (24 / interval).floor(); i++) {
       if ((hour + (interval * i) > 23)) {
         hour = hour + (interval * i) - 24;

@@ -48,9 +48,11 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> _authenticate(
-      String email, String password, String urlSegment) async {
+      String fName, String email, String password, String urlSegment) async {
     final url = 'http://192.168.0.103:8000/api/$urlSegment';
     try {
+      // print(fName);
+      // print(urlSegment);
       final response = await http.post(
         url,
         headers: headers,
@@ -59,7 +61,7 @@ class Auth with ChangeNotifier {
             'email': email,
             'password': password,
             'password_confirmation': password,
-            'name': 'Test'
+            'name': fName
           },
         ),
       );
@@ -80,12 +82,12 @@ class Auth with ChangeNotifier {
     }
   }
 
-  Future<void> signup(String email, String password) async {
-    return _authenticate(email, password, 'register');
+  Future<void> signup(String fName, String email, String password) async {
+    return _authenticate(fName, email, password, 'register');
   }
 
   Future<void> login(String email, String password) async {
-    return _authenticate(email, password, 'login');
+    return _authenticate(name, email, password, 'login');
   }
 
   Future<bool> autoLogin() async {

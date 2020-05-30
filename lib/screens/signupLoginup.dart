@@ -35,6 +35,7 @@ class _LoginSignState extends State<LoginSign>
 
   AuthMode _authMode = AuthMode.Login;
   Map<String, String> _authData = {
+    'name': '',
     'email': '',
     'password': '',
   };
@@ -97,11 +98,11 @@ class _LoginSignState extends State<LoginSign>
           _authData['email'],
           _authData['password'],
         );
-        //Navigator.of(context).pushNamed(TabsScreen.routeName);
       } else {
         // Sign user up
 
         await Provider.of<Auth>(context, listen: false).signup(
+          _authData['name'],
           _authData['email'],
           _authData['password'],
         );
@@ -231,6 +232,24 @@ class _LoginSignState extends State<LoginSign>
               child: SingleChildScrollView(
                 child: Column(
                   children: <Widget>[
+                    if (_authMode == AuthMode.Signup)
+                      TextFormField(
+                        key: Key('name'),
+                        enabled: _authMode == AuthMode.Signup,
+                        decoration: InputDecoration(
+                            labelText: 'Full Name',
+                            icon: Icon(Icons.account_circle)),
+                        textInputAction: TextInputAction.next,
+                        keyboardType: TextInputType.text,
+                        onSaved: (value) {
+                          _authData['name'] = value;
+                        },
+                        validator: _authMode == AuthMode.Signup
+                            ? (value) {
+                                return value.isEmpty ? 'Enter your name' : null;
+                              }
+                            : null,
+                      ),
                     TextFormField(
                       key: Key('email'),
                       decoration: InputDecoration(
@@ -256,6 +275,7 @@ class _LoginSignState extends State<LoginSign>
                     ),
                     if (_authMode == AuthMode.Signup)
                       TextFormField(
+                        key: Key('confirm_pass'),
                         enabled: _authMode == AuthMode.Signup,
                         decoration: InputDecoration(
                             labelText: 'Confirm Password',
@@ -284,7 +304,7 @@ class _LoginSignState extends State<LoginSign>
           Padding(
             padding: const EdgeInsets.only(left: 150.0),
             child: RaisedButton(
-              key: _authMode == AuthMode.Login ? Key('login') : Key('signin'),
+              key: _authMode == AuthMode.Login ? Key('login') : Key('signup'),
               elevation: 8,
               child: Container(
                 alignment: Alignment.center,
@@ -332,6 +352,7 @@ class _LoginSignState extends State<LoginSign>
                 height: deviceSize.height * 0,
               ),
         FlatButton(
+          key: Key('switch'),
           child: Text(
               '${_authMode == AuthMode.Login ? "Don't have an account? SIGN UP" : 'Already have an account? LOGIN'} '),
           onPressed: _switchAuthMode,

@@ -29,6 +29,7 @@ class AppDrawer extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.horizontal(right: Radius.circular(30)),
         child: Drawer(
+          key: Key('AppDrawer'),
           elevation: 10,
           child: Container(
             child: Column(
@@ -57,6 +58,7 @@ class AppDrawer extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Container(
+                        key: Key('userprofile'),
                         height: 160,
                         width: double.infinity,
                         child: Padding(
@@ -113,6 +115,7 @@ class AppDrawer extends StatelessWidget {
                   thickness: 3,
                 ),
                 ListTile(
+                  key: Key('mesurements'),
                   leading: Icon(
                     MyIcons.ruler,
                     color: Theme.of(context).accentColor,
@@ -129,6 +132,7 @@ class AppDrawer extends StatelessWidget {
                   thickness: 3,
                 ),
                 ListTile(
+                  key: Key('map'),
                   leading: Icon(
                     FontAwesomeIcons.mapMarkedAlt,
                     color: Theme.of(context).accentColor,
@@ -161,6 +165,7 @@ class AppDrawer extends StatelessWidget {
                   height: 50,
                   width: 180,
                   child: FlatButton(
+                    key: Key('logout'),
                     color: Theme.of(context).errorColor,
                     shape: StadiumBorder(),
                     onPressed: () {

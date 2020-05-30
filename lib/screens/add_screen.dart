@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:test_dasd/widgets/notification.dart';
+import '../widgets/notification.dart';
 
 import '../screens/tab_screen.dart';
 import '../my_icons_icons.dart';
@@ -145,7 +145,6 @@ class _AddScreenState extends State<AddScreen> {
   }
 
   Future<void> _save(BuildContext context) async {
-    print(_editedMedicine.instruction);
     final isValid = _form.currentState.validate();
     if (!isValid) {
       return;
@@ -334,6 +333,7 @@ class _AddScreenState extends State<AddScreen> {
               Padding(
                 padding: const EdgeInsets.only(right: 15.0),
                 child: IconButton(
+                    key: Key('done'),
                     icon: Icon(
                       Icons.check,
                       color: Colors.white,
@@ -365,6 +365,7 @@ class _AddScreenState extends State<AddScreen> {
                             children: <Widget>[
                               buildCard(
                                 child: TextFormField(
+                                  key: Key('medicineName'),
                                   initialValue: _editedMedicine.title,
                                   decoration:
                                       InputDecoration(labelText: 'Medicine'),
@@ -451,6 +452,7 @@ class _AddScreenState extends State<AddScreen> {
                                           ),
                                           Divider(),
                                           buildForm(
+                                            'instruction',
                                             '-',
                                             'Any other instructions?',
                                             '',
@@ -505,6 +507,7 @@ class _AddScreenState extends State<AddScreen> {
                                                 width: screenSize.width * 0.1,
                                               ),
                                               DropdownButton<int>(
+                                                key: Key('interval'),
                                                 hint: _selected == 0
                                                     ? Text(
                                                         "Interval",
@@ -870,13 +873,6 @@ class _AddScreenState extends State<AddScreen> {
                     ),
                   ),
                 ),
-          floatingActionButton: FloatingActionButton(
-              child: Icon(Icons.add),
-              onPressed: () => noti(
-                    _editedMedicine.amount.toString(),
-                    _editedMedicine.type,
-                    _editedMedicine.title,
-                  )),
         ),
       ),
     );

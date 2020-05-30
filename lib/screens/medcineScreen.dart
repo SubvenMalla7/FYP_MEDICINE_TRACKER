@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:test_dasd/screens/tab_screen.dart';
 
 import '../model/Medicine.dart';
 import '../model/medicine_prrovider.dart';
-import '../screens/medicines_screen.dart';
+
 import '../widgets/buildCard_widget.dart';
 import './add_screen.dart';
 
@@ -25,6 +26,7 @@ class SingleMedicine extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(top: 50.0),
             child: customAppBar(
+                'editMedicine',
                 context,
                 Icons.arrow_back,
                 Colors.white,
@@ -136,6 +138,7 @@ class SingleMedicine extends StatelessWidget {
                       width: 280,
                       height: 70,
                       child: FlatButton(
+                        key: Key('delete'),
                         color: Theme.of(context).errorColor,
                         shape: StadiumBorder(),
                         onPressed: () {
@@ -150,7 +153,7 @@ class SingleMedicine extends StatelessWidget {
                                           listen: false)
                                       .deleteMeds(medicine.id);
                                   Navigator.of(context).pushReplacementNamed(
-                                      MedicineScreen.routeName);
+                                      TabsScreen.routeName);
                                 } catch (error) {
                                   throw error.toString();
                                 }

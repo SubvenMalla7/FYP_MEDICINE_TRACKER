@@ -45,9 +45,10 @@ Future<Null> selectdate(BuildContext context, DateTime dateTime) async {
   return picked;
 }
 
-Widget buildForm(String initailValue, String label, String msg,
+Widget buildForm(String key, String initailValue, String label, String msg,
     TextInputType textInputType, Function onsaved) {
   return TextFormField(
+    key: Key(key),
     initialValue: initailValue,
     decoration: InputDecoration(labelText: label),
     textInputAction: textInputType == TextInputType.multiline
@@ -131,6 +132,7 @@ Widget deleteDialog(BuildContext context, String title, Function onpressed) {
 }
 
 Widget customAppBar(
+    String key,
     BuildContext context,
     IconData icon1,
     Color color1,
@@ -153,20 +155,17 @@ Widget customAppBar(
             icon: Icon(icon1),
             color: color1,
           ),
-          // SizedBox(
-          //   width: 10,
-          // ),
+        
           Text(
             title,
             style: TextStyle(
                 color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
           ),
-          // SizedBox(
-          //   width: 70,
-          // ),
+       
           Padding(
             padding: const EdgeInsets.only(right: 8.0),
             child: IconButton(
+              key: Key(key),
                 icon: Icon(icon2, color: color2), onPressed: onPressed2),
           ),
         ],
@@ -208,7 +207,7 @@ Widget myRadioButton2(
 Widget option(BuildContext context, Widget child) {
   return Container(
     color: Colors.white,
-    height: MediaQuery.of(context).size.height * 0.35,
+    height: MediaQuery.of(context).size.height * 0.38,
     child: Padding(
       padding: const EdgeInsets.all(10),
       child: child,

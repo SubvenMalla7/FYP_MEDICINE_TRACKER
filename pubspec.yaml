@@ -33,10 +33,12 @@ dependencies:
   url_launcher: ^5.4.2
   numberpicker: ^0.1.6
   simple_animations:
+  
 
 dev_dependencies:
-  flutter_test:
+  flutter_driver:   
     sdk: flutter
+  test: any
   mockito: ^4.1.1
 
 

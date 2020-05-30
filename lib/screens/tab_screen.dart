@@ -65,6 +65,7 @@ class _TabsScreenState extends State<TabsScreen> {
           children: <Widget>[
             BottomNavigationBar(
               elevation: 10,
+              key: Key('bottomNav'),
               onTap: _selectPage,
               backgroundColor: Theme.of(context).primaryColor.withOpacity(0.8),
               unselectedItemColor: Colors.white,

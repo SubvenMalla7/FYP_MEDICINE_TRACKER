@@ -106,14 +106,15 @@ class _MedicineSceduleState extends State<MedicineScedule> {
     Navigator.of(context).pop();
   }
 
-  Widget button(String title, double amount, String time, String statuss,
-      String message) {
+  Widget button(String key, String title, double amount, String time,
+      String statuss, String message) {
     return FlatButton(
+      key: Key(key),
       color: Theme.of(context).primaryColor,
       shape: StadiumBorder(),
       onPressed: () {
         setState(() => reasons = message);
-        print(reasons);
+        //print(reasons);
         _medicineLog = MedicineLog(
           title: title,
           amount: amount,
@@ -134,6 +135,7 @@ class _MedicineSceduleState extends State<MedicineScedule> {
   }
 
   Widget snoozeButton(
+    String key,
     String amount,
     String type,
     int min,
@@ -141,6 +143,7 @@ class _MedicineSceduleState extends State<MedicineScedule> {
     String message,
   ) {
     return FlatButton(
+      key: Key(key),
       shape: StadiumBorder(),
       color: Theme.of(context).primaryColor,
       onPressed: () {
@@ -193,11 +196,11 @@ class _MedicineSceduleState extends State<MedicineScedule> {
             sized(),
             sized(),
             sized(),
-            button(medicine.title, medicine.amount, medicine.time, 'Taken',
-                'On Time: (${medicine.time})'),
+            button('onMedicineTime', medicine.title, medicine.amount,
+                medicine.time, 'Taken', 'On Time: (${medicine.time})'),
             sized(),
-            button(medicine.title, medicine.amount, time.format(context),
-                'Taken', 'Now (${time.format(context)})'),
+            button('onCurrentTime', medicine.title, medicine.amount,
+                time.format(context), 'Taken', 'Now (${time.format(context)})'),
             sized(),
             FlatButton(
               shape: StadiumBorder(),
@@ -235,6 +238,7 @@ class _MedicineSceduleState extends State<MedicineScedule> {
             sized(),
             sized(),
             snoozeButton(
+              'snooze1',
               medicine.amount.toString(),
               medicine.type,
               5,
@@ -243,6 +247,7 @@ class _MedicineSceduleState extends State<MedicineScedule> {
             ),
             sized(),
             snoozeButton(
+              'snooze2',
               medicine.amount.toString(),
               medicine.type,
               10,
@@ -251,6 +256,7 @@ class _MedicineSceduleState extends State<MedicineScedule> {
             ),
             sized(),
             snoozeButton(
+              'snooze3',
               medicine.amount.toString(),
               medicine.type,
               30,
@@ -259,6 +265,7 @@ class _MedicineSceduleState extends State<MedicineScedule> {
             ),
             sized(),
             snoozeButton(
+              'snooze4',
               medicine.amount.toString(),
               medicine.type,
               60,
@@ -289,14 +296,14 @@ class _MedicineSceduleState extends State<MedicineScedule> {
             sized(),
             sized(),
             sized(),
-            button(medicine.title, medicine.amount, medicine.time, 'Skipped',
-                "Medicine isn't near me"),
+            button('reason1', medicine.title, medicine.amount, medicine.time,
+                'Skipped', "Medicine isn't near me"),
             sized(),
-            button(medicine.title, medicine.amount, medicine.time, 'Skipped',
-                "Forgot/ busy/Asleep"),
+            button('reason2', medicine.title, medicine.amount, medicine.time,
+                'Skipped', "Forgot/ busy/Asleep"),
             sized(),
-            button(medicine.title, medicine.amount, medicine.time, 'Skipped',
-                "Ran out of the medicine"),
+            button('reason3', medicine.title, medicine.amount, medicine.time,
+                'Skipped', "Ran out of the medicine"),
             sized(),
           ],
         ),
@@ -409,6 +416,7 @@ class _MedicineSceduleState extends State<MedicineScedule> {
                               Column(
                                 children: <Widget>[
                                   IconButton(
+                                    key: Key('taken'),
                                     icon: Icon(
                                       Icons.check,
                                       color: colors,
@@ -434,6 +442,7 @@ class _MedicineSceduleState extends State<MedicineScedule> {
                               Column(
                                 children: <Widget>[
                                   IconButton(
+                                    key: Key('snooze'),
                                     icon: Icon(Icons.snooze,
                                         color: Color.fromRGBO(240, 208, 0, 1)),
                                     iconSize: 35,
@@ -456,6 +465,7 @@ class _MedicineSceduleState extends State<MedicineScedule> {
                               Column(
                                 children: <Widget>[
                                   IconButton(
+                                    key: Key('skiped'),
                                     icon: Icon(
                                       Icons.cancel,
                                       color: Colors.red,
@@ -466,7 +476,7 @@ class _MedicineSceduleState extends State<MedicineScedule> {
 
                                       setState(() {
                                         status = 'cancel';
-                                        text = 'Skipped ';
+                                        text = 'Skipped';
                                         color = Colors.red;
                                       });
                                     },

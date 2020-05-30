@@ -93,6 +93,7 @@ class _AddUserDetailsState extends State<AddUserDetails> {
             child: Column(
               children: <Widget>[
                 customAppBar(
+                    'userSubmit',
                     context,
                     Icons.cancel,
                     Theme.of(context).errorColor,
@@ -112,6 +113,7 @@ class _AddUserDetailsState extends State<AddUserDetails> {
                                   child: Column(
                                     children: <Widget>[
                                       buildForm(
+                                          'username',
                                           _editedData.name,
                                           'Full Name',
                                           'Please enter your Name',
@@ -129,6 +131,7 @@ class _AddUserDetailsState extends State<AddUserDetails> {
                                                 )
                                               }),
                                       buildForm(
+                                          'userEmail',
                                           _editedData.email,
                                           'Email',
                                           'Please enter your email',
@@ -146,6 +149,7 @@ class _AddUserDetailsState extends State<AddUserDetails> {
                                                 )
                                               }),
                                       buildForm(
+                                          'userPhone',
                                           _editedData.phone,
                                           'Phone',
                                           'Please enter your Phone',
@@ -175,6 +179,7 @@ class _AddUserDetailsState extends State<AddUserDetails> {
                                           Container(
                                             width: 120,
                                             child: buildForm(
+                                                'userAge',
                                                 _editedData.age == null
                                                     ? ''
                                                     : _editedData.age
@@ -234,6 +239,7 @@ class _AddUserDetailsState extends State<AddUserDetails> {
                                   child: Column(
                                     children: <Widget>[
                                       buildForm(
+                                          '',
                                           _editedData.condition,
                                           'Medical Conditions (if any)',
                                           '',

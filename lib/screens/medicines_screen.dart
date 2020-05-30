@@ -21,6 +21,7 @@ class MedicineScreen extends StatelessWidget {
       child: Scaffold(
           drawer: AppDrawer(),
           floatingActionButton: FloatingActionButton(
+            key: Key('addMedicine'),
             child: Icon(Icons.add),
             onPressed: () =>
                 Navigator.of(context).pushNamed(AddScreen.routeName),

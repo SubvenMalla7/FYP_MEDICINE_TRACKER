@@ -39,7 +39,7 @@ class Medicines with ChangeNotifier {
     try {
       final response = await http.get(url, headers: headers);
       final extractedData = json.decode(response.body);
-      print(extractedData);
+      //print(extractedData);
 
       final List<Medicine> loadedMedicine = [];
       var data = extractedData;
@@ -111,7 +111,7 @@ class Medicines with ChangeNotifier {
         if (MyIcons.medicine_bottle.codePoint == int.parse(medData['icon'])) {
           icon = MyIcons.medicine_bottle;
         }
-        print("object");
+        //print("object");
         loadedMedicine.add(
           Medicine(
               id: medData['id'].toString(),
@@ -130,7 +130,7 @@ class Medicines with ChangeNotifier {
               note: medData['note'],
               type: medData['type']),
         );
-        print('sdasdas${medData['id']}');
+        //print('sdasdas${medData['id']}');
       });
 
       _items = loadedMedicine;
@@ -143,7 +143,7 @@ class Medicines with ChangeNotifier {
 
   Future<void> addMedicines(Medicine medicine) async {
     final url = 'http://192.168.0.103:8000/api/medicine?api_token=$authtoken';
-    print(url);
+    
 
     final response = await http.post(
       url,
@@ -162,7 +162,7 @@ class Medicines with ChangeNotifier {
         'note': medicine.note,
       }),
     );
-    print(response.body);
+   // print(response.body);
 
     final newMedicine = Medicine(
       id: json.decode(response.body)['data']['id'].toString(),
