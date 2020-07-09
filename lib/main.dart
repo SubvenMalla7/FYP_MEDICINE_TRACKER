@@ -19,7 +19,7 @@ import './screens/signupLoginup.dart';
 void main() {
   runApp(MyApp());
 }
-// AIzaSyAtji8RF0OkgNMx4TGRPgVqgK7BBBSygtY
+
 
 class MyApp extends StatelessWidget {
   // This widget is the root of the application.
